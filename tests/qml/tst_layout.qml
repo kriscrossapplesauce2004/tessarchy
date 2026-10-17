@@ -119,7 +119,7 @@ TestCase {
         compare(Policy.workspaceSlots([1, 2]), 5);
         compare(Policy.workspaceSlots([1, 7, 3]), 7);
         compare(Policy.workspaceSlots([-1, 2]), 5);
-}
+    }
     function test_notification_placements() {
         const phone = Policy.notificationPlacement("phone", 400);
         verify(phone.fullWidth);

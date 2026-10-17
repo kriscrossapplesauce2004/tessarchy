@@ -40,6 +40,7 @@ function workspaceSlots(ids) {
     }
     return slots;
 }
+
 // Notification pop-ups dock below the status bar. Phone cards span the panel;
 // larger screens right-align a bounded column.
 function notificationPlacement(mode, width) {
@@ -55,6 +56,7 @@ function notificationTimeout(urgency) {
     if (urgency === 0) return 4;
     return 8;
 }
+
 // Media: prefer the player that is actually playing; otherwise the first
 // connected player; -1 when no player is connected.
 function preferredPlayerIndex(playing) {
@@ -69,6 +71,7 @@ function mediaSummary(title, artist) {
     const by = artist && artist.length > 0 ? artist : "Unknown artist";
     return track + " — " + by;
 }
+
 function nodeLabel(description, nickname, name) {
     for (const candidate of [description, nickname, name]) {
         if (candidate !== undefined && candidate !== null && String(candidate).trim() !== "") return String(candidate).trim();
@@ -91,6 +94,7 @@ function playbackStream(mediaClass) {
 function volumePercent(value) {
     return Math.round(Math.max(0, Math.min(1, Number(value) || 0)) * 100);
 }
+
 function duration(seconds) {
     const total = Math.floor(Number(seconds) || 0);
     if (!isFinite(total) || total <= 0) return "";
