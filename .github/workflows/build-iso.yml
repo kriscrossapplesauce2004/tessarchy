@@ -1,0 +1,121 @@
+name: Build Tessarchy ISO
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Optional prerelease tag; creates a draft for review after boot captures'
+        required: false
+        type: string
+  pull_request:
+    paths:
+      - '.github/workflows/build-iso.yml'
+      - 'iso/**'
+      - 'shell/**'
+      - 'session/**'
+      - 'scripts/stage-iso.sh'
+      - 'scripts/boot-test-iso.py'
+
+permissions:
+  contents: read
+
+jobs:
+  live-iso:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check source workflows
+        run: ./scripts/check.sh
+      - name: Build Arch live image in disposable container
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          docker run --privileged --rm \
+            --volume "$PWD:/workspace" --workdir /workspace \
+            --env "TESSARCHY_COMMIT=$GITHUB_SHA" \
+            archlinux:base bash -euo pipefail -c '
+              pacman -Syu --noconfirm --needed archiso
+              ./scripts/stage-iso.sh
+              mkarchiso -v -w build/iso-work -o dist build/iso-profile 2>&1 | tee dist/build.log
+              cp build/iso-work/iso/arch/pkglist.x86_64.txt dist/packages.txt
+              printf "Commit: %s\nBuilt: %s\n" "$TESSARCHY_COMMIT" "$(date -u --iso-8601=seconds)" > dist/build-info.txt
+              pacman -Q archiso >> dist/build-info.txt
+              cd dist
+              sha256sum tessarchy-*.iso > SHA256SUMS
+            '
+      - name: Upload live ISO and build evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tessarchy-live-x86_64-${{ github.run_number }}
+          path: dist/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 3
+
+  tester-draft:
+    if: github.event_name == 'workflow_dispatch' && inputs.release_tag != ''
+    needs: live-iso
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: tessarchy-live-x86_64-${{ github.run_number }}
+          path: dist
+      - name: Verify the built image
+        working-directory: dist
+        run: sha256sum -c SHA256SUMS
+      - name: Prepare disposable boot checks
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends qemu-system-x86 ovmf python3-pil
+      - name: Capture BIOS and UEFI boots without a guest disk
+        shell: bash
+        run: |
+          set -euo pipefail
+          images=(dist/tessarchy-*.iso)
+          [[ ${#images[@]} == 1 ]]
+          accel=tcg
+          seconds=360
+          if [[ -e /dev/kvm ]]; then
+            sudo chmod a+rw /dev/kvm
+            accel=kvm
+            seconds=90
+          fi
+          echo "Boot capture: $accel, $seconds seconds per firmware"
+          python3 scripts/boot-test-iso.py "${images[0]}" build/boot-bios --firmware bios --accel "$accel" --seconds "$seconds" &
+          bios=$!
+          python3 scripts/boot-test-iso.py "${images[0]}" build/boot-uefi --firmware uefi --accel "$accel" --seconds "$seconds" &
+          uefi=$!
+          wait "$bios"
+          wait "$uefi"
+          cp build/boot-bios/final.png dist/boot-bios.png
+          cp build/boot-uefi/final.png dist/boot-uefi.png
+          tar -czf dist/boot-evidence.tar.gz -C build boot-bios boot-uefi
+          printf '%s\n' "BIOS and UEFI captures collected in diskless QEMU/$accel with 2 GiB RAM." 'Screenshots require review; capture completion alone is not a boot-success claim.' > dist/BOOT-TESTING.md
+      - name: Create a draft tester prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ $RELEASE_TAG =~ ^v[0-9][0-9A-Za-z.-]*$ ]]
+          gh release create "$RELEASE_TAG" --draft --prerelease --target "$GITHUB_SHA" \
+            --title "Tessarchy $RELEASE_TAG — tester ISO" \
+            --notes "Tester ISO draft. Review the attached BIOS/UEFI boot captures before publishing. No installer or persistence; physical keyboard required." \
+            dist/tessarchy-*.iso dist/SHA256SUMS dist/build-info.txt dist/packages.txt \
+            dist/build.log dist/boot-bios.png dist/boot-uefi.png dist/boot-evidence.tar.gz dist/BOOT-TESTING.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: boot-evidence-${{ github.run_number }}
+          path: build/boot-*/
+          if-no-files-found: warn
+          retention-days: 7
