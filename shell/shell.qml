@@ -48,6 +48,8 @@ ShellRoot {
             readonly property int navHeight: isPhone ? 72 : 80
             readonly property int launcherRows: Math.ceil(4 / Policy.columns(mode, Policy.panelWidth(mode, modelData.width) - 32))
             readonly property string modeLabel: (shellPreferences.layoutMode === "auto" ? "Auto · " : "") + Policy.title(mode)
+            // Bumped whenever window previews should recapture (page open, Refresh, mode actions).
+            property int windowPreviewTick: 0
             SystemClock {
                 id: clock
                 precision: SystemClock.Minutes
@@ -177,6 +179,10 @@ ShellRoot {
                                 ColumnLayout {
                                     visible: panel.page === "windows"
                                     Layout.fillWidth: true
+                                    onVisibleChanged: {
+                                        if (visible)
+                                            surface.windowPreviewTick++;
+                                    }
                                     Text {
                                         visible: Hyprland.toplevels.values.length === 0
                                         text: "No recent apps. Tap Home to launch one."
@@ -184,43 +190,101 @@ ShellRoot {
                                         wrapMode: Text.WordWrap
                                         Layout.fillWidth: true
                                     }
-                                    Repeater {
-                                        model: Hyprland.toplevels
-                                        delegate: ColumnLayout {
-                                            id: windowRow
-                                            required property var modelData
-                                            readonly property var handle: modelData.wayland
-                                            Layout.fillWidth: true
-                                            spacing: 4
-                                            TouchButton {
-                                                text: (windowRow.modelData.activated ? "● " : "") + (windowRow.modelData.title || "Untitled window")
+                                    TouchButton {
+                                        visible: Hyprland.toplevels.values.length > 0
+                                        text: "Refresh previews"
+                                        Layout.fillWidth: true
+                                        Accessible.name: "Recapture window previews"
+                                        onClicked: surface.windowPreviewTick++
+                                    }
+                                    GridLayout {
+                                        visible: Hyprland.toplevels.values.length > 0
+                                        columns: Policy.columns(surface.mode, surface.modelData.width)
+                                        columnSpacing: 12
+                                        rowSpacing: 12
+                                        Layout.fillWidth: true
+                                        Repeater {
+                                            model: Hyprland.toplevels
+                                            delegate: ColumnLayout {
+                                                id: windowRow
+                                                required property var modelData
+                                                readonly property var handle: modelData.wayland
                                                 Layout.fillWidth: true
-                                                enabled: windowRow.handle !== null
-                                                onClicked: {
-                                                    windowRow.handle.activate();
-                                                    panel.page = "";
-                                                }
-                                            }
-                                            RowLayout {
-                                                Layout.fillWidth: true
-                                                TouchButton {
-                                                    text: windowRow.handle && windowRow.handle.maximized ? "Restore" : "Maximize"
+                                                Layout.alignment: Qt.AlignTop
+                                                spacing: 4
+                                                Rectangle {
                                                     Layout.fillWidth: true
-                                                    Layout.preferredWidth: 1
-                                                    enabled: windowRow.handle !== null
-                                                    onClicked: {
-                                                        windowRow.handle.maximized = !windowRow.handle.maximized;
+                                                    Layout.minimumHeight: 48
+                                                    implicitHeight: Math.round(width / 1.6)
+                                                    radius: 12
+                                                    color: "#0d1728"
+                                                    border.width: 1
+                                                    border.color: windowRow.modelData.activated ? root.accentColor : "#34465e"
+                                                    clip: true
+                                                    // A compositor-assisted snapshot, captured when
+                                                    // this page opens or Refresh is tapped. Windows the
+                                                    // compositor cannot copy, or that are hidden, simply
+                                                    // keep hasContent false and show their title instead.
+                                                    ScreencopyView {
+                                                        id: preview
+                                                        anchors.fill: parent
+                                                        anchors.margins: 2
+                                                        visible: preview.hasContent
+                                                        captureSource: windowRow.handle
+                                                        live: false
+                                                        paintCursor: false
+                                                        constraintSize: Qt.size(width, height)
+                                                    }
+                                                    Text {
+                                                        anchors.fill: parent
+                                                        anchors.margins: 12
+                                                        visible: !preview.hasContent
+                                                        text: windowRow.modelData.title || "Untitled window"
+                                                        color: "#b7c7cc"
+                                                        wrapMode: Text.WrapAnywhere
+                                                        elide: Text.ElideRight
+                                                        verticalAlignment: Text.AlignVCenter
+                                                        horizontalAlignment: Text.AlignHCenter
                                                     }
                                                 }
                                                 TouchButton {
-                                                    text: "Close…"
+                                                    text: (windowRow.modelData.activated ? "● " : "") + (windowRow.modelData.title || "Untitled window")
                                                     Layout.fillWidth: true
-                                                    Layout.preferredWidth: 1
                                                     enabled: windowRow.handle !== null
                                                     onClicked: {
-                                                        panel.closeTarget = windowRow.handle;
-                                                        panel.page = "close";
+                                                        windowRow.handle.activate();
+                                                        panel.page = "";
                                                     }
+                                                }
+                                                RowLayout {
+                                                    Layout.fillWidth: true
+                                                    TouchButton {
+                                                        text: windowRow.handle && windowRow.handle.maximized ? "Restore" : "Maximize"
+                                                        Layout.fillWidth: true
+                                                        Layout.preferredWidth: 1
+                                                        enabled: windowRow.handle !== null
+                                                        onClicked: {
+                                                            windowRow.handle.maximized = !windowRow.handle.maximized;
+                                                            surface.windowPreviewTick++;
+                                                        }
+                                                    }
+                                                    TouchButton {
+                                                        text: "Close…"
+                                                        Layout.fillWidth: true
+                                                        Layout.preferredWidth: 1
+                                                        enabled: windowRow.handle !== null
+                                                        onClicked: {
+                                                            panel.closeTarget = windowRow.handle;
+                                                            panel.page = "close";
+                                                        }
+                                                    }
+                                                }
+                                                // Recapture on page open and manual refresh so
+                                                // previews do not go stale.
+                                                readonly property int refreshTick: surface.windowPreviewTick
+                                                onRefreshTickChanged: {
+                                                    if (panel.page === "windows" && windowRow.handle !== null)
+                                                        preview.captureFrame();
                                                 }
                                             }
                                         }
