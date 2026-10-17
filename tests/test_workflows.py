@@ -273,7 +273,11 @@ check("phone", 400, 800, 1, 0, false, 2, 0)
         self.assertIn('grim is required', result.stderr)
     def test_rotation_control_installs_and_removes_cleanly(self):
         uninstall = (ROOT / 'scripts/uninstall-dev.sh').read_text()
-        self.assertIn('RotationControl.qml', uninstall)
+        # The mirror removes every file under the installed shell/ tree,
+        # so new components need no list entry; session files stay explicit.
+        self.assertIn("find . -type f", uninstall)
+        self.assertIn('$data/shell/$relative', uninstall)
+        self.assertIn('hypridle.conf', uninstall)
         page = (ROOT / 'shell/components/SettingsPage.qml').read_text()
         self.assertIn('RotationControl {', page)
         control = (ROOT / 'shell/components/RotationControl.qml').read_text()
