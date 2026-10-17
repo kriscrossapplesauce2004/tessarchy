@@ -38,6 +38,8 @@ class Workflows(unittest.TestCase):
         data = self.home / 'data/tessarchy'
         self.assertEqual((data / 'shell/shell.qml').read_bytes(),
                          (ROOT / 'shell/shell.qml').read_bytes())
+        self.assertTrue((data / 'shell/components/NotificationCard.qml').is_file())
+        self.assertTrue((data / 'shell/icons/bell.svg').is_file())
         self.run_script('install-dev.sh', expected=1)
         self.run_script('uninstall-dev.sh')
         self.assertFalse(data.exists())

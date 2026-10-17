@@ -17,10 +17,11 @@ for launcher in start-tessarchy tessera-shell; do
 done
 rm -f -- "$HOME/.local/bin/start-tessarchy" "$HOME/.local/bin/tessera-shell"
 # Remove only installed files, never user preferences or unrelated files.
-rm -f -- "$data/shell/shell.qml" "$data/shell/components/TouchButton.qml" "$data/shell/components/NavButton.qml" "$data/shell/components/AppTile.qml" "$data/shell/components/StatusIcon.qml" "$data/shell/components/AudioStatus.qml" "$data/shell/components/BrandMark.qml" "$data/shell/components/SettingsPage.qml" "$data/shell/components/LevelSlider.qml" "$data/shell/LayoutPolicy.js"
-for icon in back home recents power browser terminal wifi cellular volume volume-muted battery settings phone tablet desktop auto controls; do rm -f -- "$data/shell/icons/$icon.svg"; done
-rm -f -- "$data/shell/artwork/aurora-fold.png" "$data/shell/artwork/tessarchy-mark.svg"
-for face in 0 1 2 3 4 5; do rm -f -- "$data/shell/artwork/mark-face-$face.svg"; done
+# The tree mirrors the repository's shell/ directory, so uninstall adapts
+# automatically when the shell grows new files and never guesses at paths.
+while IFS= read -r -d '' relative; do
+    rm -f -- "$data/shell/$relative"
+done < <(cd -- "$root/shell" && find . -type f -printf '%P\0')
 rm -f -- "$data/session/hyprland.lua" "$data/.tessarchy-dev-install"
 rmdir -- "$data/shell/artwork" "$data/shell/icons" "$data/shell/components" "$data/shell" "$data/session" "$data" 2>/dev/null || true
 echo "Development copy removed. ~/.config/tessarchy preferences retained."

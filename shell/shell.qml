@@ -8,6 +8,7 @@ import Quickshell.Hyprland
 import Quickshell.Wayland
 import Quickshell.Services.UPower
 import Quickshell.Services.SystemTray
+import Quickshell.Services.Notifications
 import "components"
 import "LayoutPolicy.js" as Policy
 
@@ -26,6 +27,7 @@ ShellRoot {
         property bool use24Hour: true
         property real barOpacity: 0.32
         property real wallpaperDim: 0.12
+        property bool doNotDisturb: false
     }
     // Bind these when wireless/modem integrations land. Never invent a signal.
     property real wifiStrength: -1
@@ -37,6 +39,46 @@ ShellRoot {
         id: audioLoader
         active: Quickshell.env("TESSARCHY_AUDIO") === "1"
         source: "components/AudioStatus.qml"
+    }
+    // Notifications: the server tracks every delivered alert (history truth),
+    // while pop-ups are ephemeral views over at most the three newest items.
+    // Capability flags match what the card actually renders: plain body text.
+    readonly property int notificationCount: notificationServer.trackedNotifications.values.length
+    property var popupNotifications: []
+    function queuePopup(notification) {
+        const next = root.popupNotifications.slice();
+        next.unshift(notification);
+        root.popupNotifications = next.slice(0, 3);
+    }
+    function hidePopup(notification) {
+        root.popupNotifications = root.popupNotifications.filter(n => n !== notification);
+    }
+    function closeNotification(notification) {
+        root.hidePopup(notification);
+        notification.dismiss();
+    }
+    function dismissAllNotifications() {
+        const items = notificationServer.trackedNotifications.values.slice();
+        for (let i = 0; i < items.length; i++) items[i].dismiss();
+    }
+    NotificationServer {
+        id: notificationServer
+        keepOnReload: true
+        bodySupported: true
+        bodyMarkupSupported: false
+        bodyHyperlinksSupported: false
+        bodyImagesSupported: false
+        actionsSupported: false
+        actionIconsSupported: false
+        imageSupported: false
+        inlineReplySupported: false
+        persistenceSupported: false
+        onNotification: notification => {
+            notification.tracked = true;
+            if (shellPreferences.doNotDisturb)
+                return;
+            root.queuePopup(notification);
+        }
     }
     Variants {
         model: Quickshell.screens
@@ -76,6 +118,8 @@ ShellRoot {
                 if (Hyprland.usingLua) Hyprland.dispatch("hl.dsp.focus({ workspace = " + id + " })");
                 else Hyprland.dispatch("workspace " + id);
             }
+            // Pop-ups render once, on the first screen, not on every output.
+            readonly property bool isPrimaryScreen: Quickshell.screens.length > 0 && Quickshell.screens[0] === modelData
             SystemClock {
                 id: clock
                 precision: SystemClock.Minutes
@@ -133,7 +177,7 @@ ShellRoot {
                         Layout.fillHeight: true
                         spacing: 8
                         Text {
-                            text: panel.page === "apps" ? "Your space" : panel.page === "windows" ? "Recent apps" : panel.page === "close" ? "Close this window?" : panel.page === "status" ? "Quick controls" : panel.page === "settings" ? "Settings" : "End this session?"
+                            text: panel.page === "apps" ? "Your space" : panel.page === "windows" ? "Recent apps" : panel.page === "close" ? "Close this window?" : panel.page === "status" ? "Quick controls" : panel.page === "notifications" ? "Alerts" : panel.page === "settings" ? "Settings" : "End this session?"
                             color: root.accentColor
                             font.pixelSize: 22
                             font.bold: true
@@ -179,6 +223,12 @@ ShellRoot {
                                             accentColor: root.accentColor
                                             onClicked: panel.showPage("status")
                                         }
+                                        AppTile {
+                                            text: "Alerts"
+                                            symbol: "bell"
+                                            accentColor: root.accentColor
+                                            onClicked: panel.showPage("notifications")
+                                        }
                                     }
                                     Text {
                                         text: "Prototype · Physical keyboard needed for text input."
@@ -200,6 +250,17 @@ ShellRoot {
                                         onEndSessionRequested: panel.page = "session"
                                         onControlsRequested: panel.page = "status"
                                         onReplayRequested: root.replayBrand()
+                                    }
+                                }
+                                Loader {
+                                    visible: active
+                                    active: panel.page === "notifications"
+                                    Layout.fillWidth: true
+                                    sourceComponent: NotificationCenter {
+                                        server: notificationServer
+                                        preferences: shellPreferences
+                                        accentColor: root.accentColor
+                                        onClearAllRequested: root.dismissAllNotifications()
                                     }
                                 }
                                 ColumnLayout {
@@ -520,9 +581,23 @@ ShellRoot {
                         accentColor: root.accentColor
                         onClicked: panel.showPage("settings")
                     }
+                    NavButton {
+                        text: root.notificationCount > 0 ? String(root.notificationCount) : ""
+                        symbol: "bell"
+                        showLabel: root.notificationCount > 0
+                        implicitWidth: 48
+                        implicitHeight: 48
+                        Layout.minimumHeight: 48
+                        Layout.fillWidth: false
+                        Layout.preferredWidth: 48
+                        accentColor: root.accentColor
+                        selected: panel.page === "notifications"
+                        Accessible.name: root.notificationCount > 0 ? "Notifications, " + root.notificationCount + " unread" : "Notifications"
+                        onClicked: panel.showPage("notifications")
+                    }
                     // Only registered application icons appear; no simulated signals.
                     RowLayout {
-                        Layout.maximumWidth: Math.max(0, surface.modelData.width - (surface.modelData.width >= 650 ? 540 : 370))
+                        Layout.maximumWidth: Math.max(0, surface.modelData.width - (surface.modelData.width >= 650 ? 588 : 418))
                         clip: true
                         spacing: 0
                         Repeater {
@@ -600,6 +675,52 @@ ShellRoot {
                         accentColor: root.accentColor
                         selected: panel.page === "settings"
                         onClicked: panel.showPage("settings")
+                    }
+                }
+            }
+            // Pop-up host: an overlay window that never reserves space and
+            // disappears entirely when no pop-ups are queued.
+            PanelWindow {
+                id: popupHost
+                screen: surface.modelData
+                visible: surface.isPrimaryScreen && root.popupNotifications.length > 0
+                readonly property var placement: Policy.notificationPlacement(surface.mode, surface.modelData.width)
+                anchors {
+                    top: true
+                    right: true
+                    left: placement.fullWidth
+                }
+                margins.top: placement.topOffset
+                implicitWidth: placement.maxWidth
+                implicitHeight: popupColumn.implicitHeight
+                exclusiveZone: 0
+                color: "transparent"
+                WlrLayershell.namespace: "tessera-notifications"
+                WlrLayershell.layer: WlrLayer.Overlay
+                WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+                ColumnLayout {
+                    id: popupColumn
+                    width: parent.width
+                    spacing: 8
+                    Repeater {
+                        model: root.popupNotifications
+                        delegate: ColumnLayout {
+                            id: popupItem
+                            required property var modelData
+                            Layout.fillWidth: true
+                            NotificationCard {
+                                Layout.fillWidth: true
+                                notification: popupItem.modelData
+                                accentColor: root.accentColor
+                                onOpened: root.hidePopup(popupItem.modelData)
+                                onClosed: root.closeNotification(popupItem.modelData)
+                            }
+                            Timer {
+                                interval: Policy.notificationTimeout(popupItem.modelData.urgency) * 1000
+                                running: interval > 0
+                                onTriggered: root.hidePopup(popupItem.modelData)
+                            }
+                        }
                     }
                 }
             }

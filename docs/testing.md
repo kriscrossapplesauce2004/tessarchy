@@ -313,3 +313,26 @@ Actually performed:
   ubuntu-24.04 with python3, lua5.4, fish, shellcheck and the Qt QML modules.
 - Not performed: observing the new workflow run on GitHub, and the pre-existing
   `qs`-gated behavior change on a host with Quickshell installed.
+## Notification center and pop-ups, 2026-10-17
+
+Implemented, static validation only; live-session acceptance pending.
+
+- `Quickshell.Services.Notifications` (verified in Quickshell 0.3.1 source):
+  the shell registers `NotificationServer` on `org.freedesktop.Notifications`.
+  Delivered items are marked `tracked` and listed in the alert center until
+  `dismiss()`ed; capability flags advertise only plain-body support.
+- `NotificationCard.qml` and `NotificationCenter.qml` render app name, summary,
+  body (three lines max, elided) and an IMPORTANT tag for critical urgency;
+  every interactive control is a TouchButton with at least 48 logical pixels.
+  Pop-ups hide on tap, dismiss via the close button, and expire after 4s/8s
+  for low/normal urgency (critical stays until dismissed). The "pop-ups muted"
+  toggle persists in `shell.ini` and is also offered in Settings.
+- `LayoutPolicy.notificationPlacement/timeout` were unit-tested: the Qt Quick
+  suite reports 17 passed including the two new notification cases.
+- `uninstall-dev.sh` no longer hardcodes the shell file list; it mirrors the
+  repository tree so new shell files (such as these components) cannot leave
+  stray files behind. The install/uninstall workflow test asserts the new
+  component and icon are removed; 10/10 workflow tests pass.
+- Not performed: running the shell against a live session bus, delivering a
+  real `notify-send`, tapping cards, pop-up stacking on multiple outputs, and
+  DND persistence across a restart. These stay on the manual list.

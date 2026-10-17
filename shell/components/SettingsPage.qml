@@ -255,6 +255,33 @@ ColumnLayout {
         }
     }
     Text {
+        text: "ALERTS"
+        color: page.accentColor
+        font {
+            pixelSize: 11
+            bold: true
+            letterSpacing: 2
+        }
+    }
+    TouchButton {
+        text: page.preferences.doNotDisturb ? "Notification pop-ups muted" : "Notification pop-ups shown"
+        selected: page.preferences.doNotDisturb
+        accentColor: page.accentColor
+        Layout.fillWidth: true
+        Accessible.name: page.preferences.doNotDisturb ? "Notification pop-ups muted, button" : "Notification pop-ups shown, button"
+        onClicked: {
+            page.preferences.doNotDisturb = !page.preferences.doNotDisturb;
+            page.preferences.sync();
+        }
+    }
+    Text {
+        text: "Muted notifications still collect in the alert center until dismissed. Nothing persists across sessions."
+        color: "#8da7b9"
+        font.pixelSize: 12
+        Layout.fillWidth: true
+        wrapMode: Text.WordWrap
+    }
+    Text {
         text: "SYSTEM"
         color: page.accentColor
         font {

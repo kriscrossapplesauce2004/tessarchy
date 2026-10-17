@@ -40,3 +40,18 @@ function workspaceSlots(ids) {
     }
     return slots;
 }
+// Notification pop-ups dock below the status bar. Phone cards span the panel;
+// larger screens right-align a bounded column.
+function notificationPlacement(mode, width) {
+    if (mode === "phone") return { fullWidth: true, maxWidth: Math.max(280, width - 16), topOffset: 56 };
+    if (mode === "tablet") return { fullWidth: false, maxWidth: Math.min(360, width - 32), topOffset: 60 };
+    return { fullWidth: false, maxWidth: Math.min(420, width - 32), topOffset: 60 };
+}
+
+// Seconds a pop-up stays on screen. Low urgency leaves sooner, normal after a
+// comfortable read, and critical notifications stay until dismissed.
+function notificationTimeout(urgency) {
+    if (urgency === 2) return 0;
+    if (urgency === 0) return 4;
+    return 8;
+}

@@ -36,6 +36,8 @@ live image is in development.
   tiling for new apps, and keyboard shortcuts for workspaces, focus, moving,
   closing, dragging and resizing windows.
 - Confirmation before closing a window or ending the session.
+- Notification pop-ups and an alert center backed by Quickshell's
+  `org.freedesktop.Notifications` server, with a persisted "mute pop-ups" toggle.
 - A dedicated Hyprland session, user installation, and reversible tty1 startup.
 - A QEMU development workflow, local Arch package recipes, and an initial
   archiso staging/build pipeline.
