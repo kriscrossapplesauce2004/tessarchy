@@ -1,0 +1,10 @@
+[  288.795637] tessera-shell[575]:   INFO: Launching config: "/usr/share/tessarchy/shell/shell.qml"
+[  288.832793] tessera-shell[575]:   INFO: Shell ID: "5941b9a7693fd9df99034b5700a2f6d5" Path ID "5941b9a7693fd9df99034b5700a2f6d5"
+[  304.502663] tessera-shell[575]:   INFO: Saving logs to "/run/user/1000/quickshell/by-id/yfwk82nt/log.qslog"
+[  309.637710] tessera-shell[575]: MESA-EGL: warning: egl: failed to create dri2 screen
+[  309.776570] tessera-shell[575]: MESA-EGL: warning: egl: failed to create dri2 screen
+[  318.711559] tessera-shell[575]:  ERROR quickshell.network: Network will not work. Could not find an available backend.
+[  348.392818] tessera-shell[575]:   INFO: Configuration Loaded
+[  367.504735] tessera-shell[575]:   WARN qt.qpa.services: Failed to register with host portal QDBusError("org.freedesktop.portal.Error.Failed", "Could not register app ID: Connection already associated with an application ID")
+[  371.849619] tessera-shell[575]:   WARN quickshell.dbus: Could not launch service org.freedesktop.UPower.PowerProfiles: QDBusError(org.freedesktop.DBus.Error.NoReply, Did not receive a reply. Possible causes include: the remote application did not send a reply, the message bus security policy blocked the reply, the reply timeout expired, or the network connection was broken.)
+[  371.860865] tessera-shell[575]:   WARN quickshell.service.powerprofiles: Could not start PowerProfilesDaemon. The PowerProfiles service will not work.
