@@ -451,47 +451,21 @@ ShellRoot {
                                             letterSpacing: 2
                                         }
                                     }
+                                    Loader {
+                                        id: audioPanelLoader
+                                        visible: active
+                                        active: panel.page === "status" && Quickshell.env("TESSARCHY_AUDIO") === "1"
+                                        Layout.fillWidth: true
+                                        sourceComponent: AudioPanel {
+                                            accentColor: root.accentColor
+                                        }
+                                    }
                                     Text {
-                                        text: root.audioAvailable ? (root.audioSink.audio.muted ? "Muted" : "Volume · " + root.volumePercent + "%") : "No audio output connected"
+                                        visible: !audioPanelLoader.item
+                                        text: "No audio output connected"
                                         color: "#f0f5ff"
                                         Layout.fillWidth: true
                                         wrapMode: Text.WordWrap
-                                    }
-                                    LevelSlider {
-                                        Layout.fillWidth: true
-                                        from: 0
-                                        to: 1
-                                        value: root.audioAvailable ? root.audioSink.audio.volume : 0
-                                        enabled: root.audioAvailable
-                                        accentColor: root.accentColor
-                                        Accessible.name: "Output volume"
-                                        onMoved: root.audioSink.audio.volume = value
-                                    }
-                                    RowLayout {
-                                        Layout.fillWidth: true
-                                        TouchButton {
-                                            text: "−"
-                                            Accessible.name: "Decrease volume"
-                                            enabled: root.audioAvailable
-                                            Layout.fillWidth: true
-                                            Layout.preferredWidth: 1
-                                            onClicked: root.audioSink.audio.volume = Math.max(0, root.audioSink.audio.volume - 0.05)
-                                        }
-                                        TouchButton {
-                                            text: root.audioAvailable && root.audioSink.audio.muted ? "Unmute" : "Mute"
-                                            enabled: root.audioAvailable
-                                            Layout.fillWidth: true
-                                            Layout.preferredWidth: 1
-                                            onClicked: root.audioSink.audio.muted = !root.audioSink.audio.muted
-                                        }
-                                        TouchButton {
-                                            text: "+"
-                                            Accessible.name: "Increase volume"
-                                            enabled: root.audioAvailable
-                                            Layout.fillWidth: true
-                                            Layout.preferredWidth: 1
-                                            onClicked: root.audioSink.audio.volume = Math.min(1, root.audioSink.audio.volume + 0.05)
-                                        }
                                     }
                                 }
                                 ColumnLayout {

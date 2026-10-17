@@ -69,3 +69,25 @@ function mediaSummary(title, artist) {
     const by = artist && artist.length > 0 ? artist : "Unknown artist";
     return track + " — " + by;
 }
+function nodeLabel(description, nickname, name) {
+    for (const candidate of [description, nickname, name]) {
+        if (candidate !== undefined && candidate !== null && String(candidate).trim() !== "") return String(candidate).trim();
+    }
+    return "Unknown device";
+}
+
+function streamLabel(appName, mediaName, nodeName) {
+    for (const candidate of [appName, mediaName, nodeName]) {
+        if (candidate !== undefined && candidate !== null && String(candidate).trim() !== "") return String(candidate).trim();
+    }
+    return "Unknown app";
+}
+
+function playbackStream(mediaClass) {
+    if (mediaClass === undefined || mediaClass === null || String(mediaClass).trim() === "") return true;
+    return String(mediaClass).indexOf("Output") >= 0;
+}
+
+function volumePercent(value) {
+    return Math.round(Math.max(0, Math.min(1, Number(value) || 0)) * 100);
+}

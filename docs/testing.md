@@ -394,3 +394,22 @@ Implemented, static validation only; live-compositor rendering pending.
 - Not performed: capturing real windows under Hyprland (protocol support,
   hidden-window behavior, frame size/aspect), preview freshness across window
   moves, and memory/perf with many windows. These stay on the manual list.
+## Audio panel, 2026-10-17
+
+Implemented, static validation only; live-audio validation pending.
+
+- Quick controls → SOUND now loads `AudioPanel` (same session gate as the
+  original volume display, which only enables audio when the PipeWire socket
+  exists at launch): default-output volume and mute, an output device picker
+  that writes `Pipewire.preferredDefaultAudioSink`, and per-app playback
+  streams (`media.class` containing Output) with volume and mute. Labels fall
+  back description → nickname → node name, volumes are clamped, and displayed
+  nodes are kept alive with `PwObjectTracker`.
+- 10/10 workflow tests pass; the Qt Quick suite reports 18 passed / 0 failed
+  on the dev host, including new cases for the device/stream label, playback
+  filter, and volume-percent helpers. `qmllint` reports no errors beyond the
+  Quickshell module imports it cannot resolve on a non-Quickshell host.
+- Not performed: switching default outputs or adjusting app streams against a
+  live PipeWire server (routing actually moving audio, device hotplug, real
+  app streams appearing/disappearing, behavior when the default sink changes
+  while the page is open). These remain on the manual list.

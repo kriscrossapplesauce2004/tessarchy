@@ -65,8 +65,11 @@ The original T logo is built from six SVG faces. BrandMark animates assembly and
 rotation once, settles after 1.6 seconds, and supports tap/replay and reduced
 motion. It has no idle animation loop. The clock updates once per minute; mode
 selection is reactive, with no polling. Optional PipeWire integration is loaded
-only when the service socket exists at launch. No hardware Wi-Fi/modem control
-or secure locking is claimed.
+only when the service socket exists at launch; its quick-controls panel
+switches the default output via `Pipewire.preferredDefaultAudioSink`, controls
+the default sink's volume and mute, and lists playback streams with per-app
+volume and mute, keeping every displayed node alive with `PwObjectTracker`.
+No hardware Wi-Fi/modem control or secure locking is claimed.
 
 ## Notification delivery
 

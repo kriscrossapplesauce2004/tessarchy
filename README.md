@@ -28,8 +28,9 @@ live image is in development.
   tile launcher.
 - Settings for layout mode, accent, opacity, wallpaper shade, clock, navigation
   labels, and reduced motion.
-- Translucent bars, Wi-Fi/cellular indicator slots, and optional PipeWire volume
-  controls. Wireless and modem backends remain to be connected.
+- Translucent bars, Wi-Fi/cellular indicator slots, and an optional PipeWire
+  audio panel with output-device switching, volume/mute, and per-app stream
+  volumes. Wireless and modem backends remain to be connected.
 - An expandable launcher for Firefox and Foot.
 - A scrollable window overview with application switching and maximize/restore.
 - A Desktop layout mode with a workspace strip, focused-window title, ordinary
