@@ -26,6 +26,7 @@ file_permissions+=(
   ["/etc/shadow"]="0:0:400"
   ["/home/tess"]="1000:1000:750"
   ["/home/tess/.bash_profile"]="1000:1000:644"
+  ["/home/tess/.config/fish/config.fish"]="1000:1000:644"
   ["/usr/bin/start-tessarchy"]="0:0:755"
   ["/usr/bin/tessera-shell"]="0:0:755"
 )
@@ -40,8 +41,9 @@ cp -a "$root/iso/airootfs/." "$airoot/"
 # Releng uses zsh for its root rescue login. Our smaller package set uses Bash.
 sed -i 's|^\(root:[^:]*:0:0:[^:]*:[^:]*:\).*|\1/usr/bin/bash|' "$airoot/etc/passwd"
 # Create the live user via systemd-sysusers, preserving base account databases.
+# The home scaffolding comes from the skel tree: Bash and fish login profiles.
 mkdir -p "$airoot/home/tess"
-cp "$root/iso/airootfs/etc/skel/.bash_profile" "$airoot/home/tess/.bash_profile"
+cp -a "$root/iso/airootfs/etc/skel/." "$airoot/home/tess/"
 # Releng may enable SSH for rescue. Keep network services out of this prototype.
 find "$airoot/etc/systemd/system" -type l -name 'sshd.service' -delete
 mkdir -p "$airoot/etc/systemd/system/multi-user.target.wants"

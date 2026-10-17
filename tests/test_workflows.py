@@ -241,7 +241,11 @@ check("phone", 400, 800, 1, 0, false, 2, 0)
         self.assertNotIn('linux-firmware', (profile / 'packages.x86_64').read_text())
         self.assertTrue((profile / 'airootfs/etc/systemd/system/multi-user.target.wants/systemd-networkd.service').is_symlink())
         self.assertTrue((profile / 'airootfs/usr/bin/start-tessarchy').stat().st_mode & 0o111)
-        self.assertIn('u tess 1000', (profile / 'airootfs/etc/sysusers.d/tessarchy.conf').read_text())
+        self.assertIn('u tess 1000 "Tessarchy live user" /home/tess /usr/bin/fish',
+                      (profile / 'airootfs/etc/sysusers.d/tessarchy.conf').read_text())
+        self.assertIn('fish', (profile / 'packages.x86_64').read_text().splitlines())
+        self.assertTrue((profile / 'airootfs/home/tess/.config/fish/config.fish').is_file())
+        self.assertIn('/home/tess/.config/fish/config.fish', (profile / 'profiledef.sh').read_text())
         result = subprocess.run(command, env=env, capture_output=True, text=True)
         self.assertNotEqual(result.returncode, 0)
 

@@ -11,6 +11,7 @@ if [[ -x /usr/lib/qt6/bin/qmltestrunner && -d /usr/lib/qt6/qml/QtTest ]]; then
         /usr/lib/qt6/bin/qmltestrunner -input tests/qml
 else echo "SKIP: Qt Quick Test unavailable"; fi
 if command -v luac >/dev/null; then luac -p session/hyprland.lua session/preferences.example.lua; else echo "SKIP: luac unavailable"; fi
+if command -v fish >/dev/null; then fish -n iso/airootfs/etc/skel/.config/fish/config.fish; else echo "SKIP: fish unavailable"; fi
 if command -v Hyprland >/dev/null; then
     # Verification must not load the current user's preferences.
     XDG_CONFIG_HOME="$scratch" Hyprland --verify-config -c "$root/session/hyprland.lua"

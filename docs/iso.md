@@ -13,8 +13,11 @@ for now. The image includes both the boot methods of the installed releng
 profile; BIOS and UEFI must both be tested. It does not install onto a disk.
 
 The live user `tess` is created through systemd-sysusers with a locked password,
-no sudo grant, and tty1 autologin. tmpfiles establishes home ownership. A login
-profile starts Tessera once and returns to the TTY on exit. No secure locking or
+no sudo grant, tty1 autologin, and fish as the login shell (`fish` is added to
+the package list). tmpfiles and `file_permissions` establish home ownership for
+the Bash and fish login profiles; both start Tessera once on tty1 and return to
+the TTY on exit. Nothing in the fish profile is needed for development installs
+where Bash starts the session. No secure locking or
 login protection is provided. Releng's root rescue account remains available
 according to upstream defaults. SSH enablement links are removed from the
 staged profile; user-mode VM NAT exposes no forwarded ports. This is a disposable
