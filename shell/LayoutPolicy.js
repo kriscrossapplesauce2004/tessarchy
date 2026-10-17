@@ -111,3 +111,16 @@ function nextTransform(current) {
     const value = Number.isInteger(current) ? current : 0;
     return ((value + 1) % 4 + 4) % 4;
 }
+
+// Wi-Fi signal strength is 0.0..1.0 from NetworkManager; display as percent.
+function signalPercent(strength) {
+    return Math.round(Math.max(0, Math.min(1, Number(strength) || 0)) * 100);
+}
+
+// What tapping a network row does: connected ones disconnect; saved profiles
+// and open networks connect; anything else needs a password profile first.
+function wifiAction(connected, known, openSecurity) {
+    if (connected) return "disconnect";
+    if (known || openSecurity) return "connect";
+    return "none";
+}

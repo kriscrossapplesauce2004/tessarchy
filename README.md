@@ -35,7 +35,11 @@ live tester ISO.
   focused display in 90° steps.
 - Translucent bars, Wi-Fi/cellular indicator slots, and an optional PipeWire
   audio panel with output-device switching, volume/mute, and per-app stream
-  volumes. Wireless and modem backends remain to be connected.
+  volumes. Where NetworkManager runs, Quick controls lists nearby Wi-Fi
+  networks with a radio toggle, the status bar shows live signal strength, and
+  saved or open networks connect with a tap. New secured networks still need a
+  profile created first (nmcli); password entry waits for the on-screen
+  keyboard. Cellular modem backends remain unconnected.
 - Screen brightness in quick controls wherever a backlight exists, with
   XF86MonBrightness keys wired to the same shipped helper, plus a persisted
   hyprsunset night-light toggle (both shipped in the live image).

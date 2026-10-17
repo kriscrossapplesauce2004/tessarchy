@@ -95,9 +95,21 @@ preference on shell start. Screen idle behavior is owned by
 hypridle, started from the session's `hyprland.start` hook with Tessarchy's own
 config: after 300 seconds without input it runs `hyprctl dispatch dpms off`,
 and the next input brings the panel back. It honors idle inhibitors, configures
-no lock command. No hardware Wi-Fi/modem control is claimed.
+no lock command.
 
-No hardware Wi-Fi/modem control or secure locking is claimed.
+Wi-Fi uses Quickshell's Networking service (NetworkManager over D-Bus), loaded
+only when a NetworkManager backend is present; with none, the panel says so and
+no Wi-Fi control is offered. The status bar's Wi-Fi icon binds
+`Networking.wifiEnabled`/the connected network's `signalStrength` through the
+same `StatusIcon.available` state that says "disconnected" rather than
+"unavailable". The panel enables the device scanner only while it is visible,
+sorts connected-then-strongest, and decides taps with `Policy.wifiAction`:
+connected networks disconnect, saved or open networks connect, anything else
+stays disabled with an explanatory label. No password is ever passed: new
+secured networks need a saved profile (nmcli) until the on-screen keyboard
+lands. Only monitor-backed displays are trusted for labels; nothing device- or
+network-supplied reaches a command or path. Cellular modem control and secure
+locking are not claimed.
 
 ## Notification delivery
 

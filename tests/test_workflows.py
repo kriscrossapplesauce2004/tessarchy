@@ -284,6 +284,21 @@ check("phone", 400, 800, 1, 0, false, 2, 0)
         self.assertIn('Quickshell.execDetached([', control)
         self.assertIn('"keyword", "monitor"', control)
         self.assertIn('transform', control)
+    def test_wifi_panel_uses_networking_api_without_psk_entry(self):
+        shell = (ROOT / 'shell/shell.qml').read_text()
+        self.assertIn('import Quickshell.Networking', shell)
+        self.assertIn('WifiPanel {', shell)
+        self.assertIn('available: root.networkBackend', shell)
+        panel = (ROOT / 'shell/components/WifiPanel.qml').read_text()
+        # Policy decides connect vs disconnect; no password is ever passed.
+        self.assertIn('Policy.wifiAction(', panel)
+        self.assertIn('network.connect()', panel)
+        self.assertIn('network.disconnect()', panel)
+        self.assertNotIn('connectWithPsk', panel)
+        # Scanner runs only while the panel is visible.
+        self.assertIn('scannerEnabled = panel.visible', panel)
+        icon = (ROOT / 'shell/components/StatusIcon.qml').read_text()
+        self.assertIn('property bool available', icon)
 
     def test_iso_staging_preserves_boot_assets_and_account_databases(self):
         # Minimal fixture exercises our assembly, not upstream archiso validity.
