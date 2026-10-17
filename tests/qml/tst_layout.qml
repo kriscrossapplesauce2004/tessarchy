@@ -141,4 +141,17 @@ TestCase {
         compare(Policy.notificationTimeout(1), 8);
         compare(Policy.notificationTimeout(2), 0);
     }
+    function test_preferred_player_index() {
+        compare(Policy.preferredPlayerIndex([]), -1);
+        compare(Policy.preferredPlayerIndex([false]), 0);
+        compare(Policy.preferredPlayerIndex([false, true]), 1);
+        compare(Policy.preferredPlayerIndex([true, true]), 0);
+        compare(Policy.preferredPlayerIndex([false, false, true]), 2);
+    }
+    function test_media_summary() {
+        compare(Policy.mediaSummary("Song", "Band"), "Song — Band");
+        compare(Policy.mediaSummary("", "Band"), "Unknown track — Band");
+        compare(Policy.mediaSummary("Song", ""), "Song — Unknown artist");
+        compare(Policy.mediaSummary(null, null), "Unknown track — Unknown artist");
+    }
 }

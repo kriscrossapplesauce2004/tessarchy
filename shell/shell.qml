@@ -9,6 +9,7 @@ import Quickshell.Wayland
 import Quickshell.Services.UPower
 import Quickshell.Services.SystemTray
 import Quickshell.Services.Notifications
+import Quickshell.Services.Mpris
 import "components"
 import "LayoutPolicy.js" as Policy
 
@@ -79,6 +80,14 @@ ShellRoot {
                 return;
             root.queuePopup(notification);
         }
+    // One media player drives the status-bar indicator and the Quick controls
+    // card: the playing player wins, otherwise the first connected one.
+    readonly property var activePlayer: {
+        const list = Mpris.players.values;
+        const playing = [];
+        for (let i = 0; i < list.length; i++) playing.push(list[i].isPlaying);
+        const index = Policy.preferredPlayerIndex(playing);
+        return index < 0 ? null : list[index];
     }
     Variants {
         model: Quickshell.screens
@@ -421,6 +430,112 @@ ShellRoot {
                                         }
                                     }
                                 }
+                                ColumnLayout {
+                                    visible: panel.page === "status"
+                                    Layout.fillWidth: true
+                                    spacing: 16
+                                    Text {
+                                        text: "NOW PLAYING"
+                                        color: "#8da7b9"
+                                        font {
+                                            pixelSize: 11
+                                            letterSpacing: 2
+                                        }
+                                    }
+                                    Text {
+                                        visible: root.activePlayer === null
+                                        text: "No media player connected. Players appear here when they register with the session."
+                                        color: "#f0f5ff"
+                                        Layout.fillWidth: true
+                                        wrapMode: Text.WordWrap
+                                    }
+                                    Text {
+                                        visible: root.activePlayer !== null
+                                        text: root.activePlayer ? (root.activePlayer.trackTitle || "Unknown track") : ""
+                                        color: "#f0f5ff"
+                                        font {
+                                            pixelSize: 16
+                                            bold: true
+                                        }
+                                        elide: Text.ElideRight
+                                        Layout.fillWidth: true
+                                    }
+                                    Text {
+                                        visible: root.activePlayer !== null
+                                        text: root.activePlayer ? ((root.activePlayer.trackArtist || "Unknown artist") + " · " + (root.activePlayer.identity || "Player")) : ""
+                                        color: "#aabccb"
+                                        font.pixelSize: 13
+                                        elide: Text.ElideRight
+                                        Layout.fillWidth: true
+                                    }
+                                    RowLayout {
+                                        visible: root.activePlayer !== null
+                                        Layout.fillWidth: true
+                                        TouchButton {
+                                            text: "◀◀"
+                                            Accessible.name: "Previous track"
+                                            enabled: root.activePlayer !== null && root.activePlayer.canGoPrevious
+                                            Layout.fillWidth: true
+                                            Layout.preferredWidth: 1
+                                            onClicked: {
+                                                const player = root.activePlayer;
+                                                if (player)
+                                                    player.previous();
+                                            }
+                                        }
+                                        TouchButton {
+                                            text: root.activePlayer && root.activePlayer.isPlaying ? "Pause" : "Play"
+                                            enabled: root.activePlayer !== null && root.activePlayer.canTogglePlaying
+                                            Layout.fillWidth: true
+                                            Layout.preferredWidth: 1
+                                            onClicked: {
+                                                const player = root.activePlayer;
+                                                if (player)
+                                                    player.isPlaying = !player.isPlaying;
+                                            }
+                                        }
+                                        TouchButton {
+                                            text: "▶▶"
+                                            Accessible.name: "Next track"
+                                            enabled: root.activePlayer !== null && root.activePlayer.canGoNext
+                                            Layout.fillWidth: true
+                                            Layout.preferredWidth: 1
+                                            onClicked: {
+                                                const player = root.activePlayer;
+                                                if (player)
+                                                    player.next();
+                                            }
+                                        }
+                                    }
+                                    RowLayout {
+                                        visible: root.activePlayer !== null
+                                        Layout.fillWidth: true
+                                        TouchButton {
+                                            text: "−10s"
+                                            Accessible.name: "Seek backward ten seconds"
+                                            enabled: root.activePlayer !== null && root.activePlayer.canSeek
+                                            Layout.fillWidth: true
+                                            Layout.preferredWidth: 1
+                                            onClicked: {
+                                                const player = root.activePlayer;
+                                                if (player)
+                                                    player.seek(-10);
+                                            }
+                                        }
+                                        TouchButton {
+                                            text: "＋10s"
+                                            Accessible.name: "Seek forward ten seconds"
+                                            enabled: root.activePlayer !== null && root.activePlayer.canSeek
+                                            Layout.fillWidth: true
+                                            Layout.preferredWidth: 1
+                                            onClicked: {
+                                                const player = root.activePlayer;
+                                                if (player)
+                                                    player.seek(10);
+                                            }
+                                        }
+                                    }
+                                }
                                 RowLayout {
                                     visible: panel.page === "status"
                                     Layout.fillWidth: true
@@ -597,6 +712,21 @@ ShellRoot {
                         Layout.maximumWidth: 360
                         Layout.leftMargin: 8
                         Accessible.name: text.length > 0 ? "Focused window " + text : ""
+}
+                    NavButton {
+                        visible: root.activePlayer !== null
+                        text: root.activePlayer ? (root.activePlayer.isPlaying ? "Playing" : "Paused") : ""
+                        symbol: "music"
+                        showLabel: false
+                        implicitWidth: 48
+                        implicitHeight: 48
+                        Layout.minimumHeight: 48
+                        Layout.fillWidth: false
+                        Layout.preferredWidth: 48
+                        accentColor: root.accentColor
+                        selected: panel.page === "status"
+                        Accessible.name: root.activePlayer ? Policy.mediaSummary(root.activePlayer.trackTitle, root.activePlayer.trackArtist) : "Media player"
+                        onClicked: panel.showPage("status")
                     }
                     TouchButton {
                         visible: surface.modelData.width >= 650
