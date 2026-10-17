@@ -1,0 +1,12 @@
+
+  Tessarchy live prototype — no installer, no persistence, no secure locking.
+
+  A graphical session starts automatically on tty1 (live user "tess",
+  password login disabled). Exit Tessera to return to this console and run
+  start-tessarchy to launch it again. Root rescue login remains available
+  on this console after the session exits.
+
+  The virtual machine keyboard is required for text input; the virtual
+  tablet is a single-pointer touchscreen. Documentation lives in
+  /usr/share/tessarchy/docs.
+

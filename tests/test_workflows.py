@@ -210,7 +210,7 @@ check("phone", 400, 800, 1, 0, false, 2, 0)
         repo = self.home / 'source'
         (repo / 'scripts').mkdir(parents=True)
         import shutil
-        for directory in ('shell', 'session', 'iso'):
+        for directory in ('shell', 'session', 'iso', 'docs'):
             shutil.copytree(ROOT / directory, repo / directory)
         shutil.copy2(ROOT / 'scripts/stage-iso.sh', repo / 'scripts')
         base = self.home / 'releng'
@@ -240,6 +240,14 @@ check("phone", 400, 800, 1, 0, false, 2, 0)
         self.assertNotIn('unused-rescue-tool', (profile / 'packages.x86_64').read_text())
         self.assertNotIn('linux-firmware', (profile / 'packages.x86_64').read_text())
         self.assertTrue((profile / 'airootfs/etc/systemd/system/multi-user.target.wants/systemd-networkd.service').is_symlink())
+        self.assertTrue((profile / 'airootfs/etc/systemd/system/multi-user.target.wants/systemd-timesyncd.service').is_symlink())
+        self.assertEqual((profile / 'airootfs/etc/hostname').read_text().strip(), 'tessarchy')
+        self.assertIn('en_US.UTF-8', (profile / 'airootfs/etc/locale.conf').read_text())
+        self.assertIn('en_US.UTF-8', (profile / 'airootfs/etc/locale.gen').read_text())
+        self.assertIn('/usr/share/tessarchy/docs', (profile / 'airootfs/etc/motd').read_text())
+        self.assertIn('Storage=volatile',
+                      (profile / 'airootfs/etc/systemd/journald.conf.d/volatile.conf').read_text())
+        self.assertTrue((profile / 'airootfs/usr/share/tessarchy/docs/iso.md').is_file())
         self.assertTrue((profile / 'airootfs/usr/bin/start-tessarchy').stat().st_mode & 0o111)
         self.assertIn('u tess 1000 "Tessarchy live user" /home/tess /usr/bin/fish',
                       (profile / 'airootfs/etc/sysusers.d/tessarchy.conf').read_text())

@@ -34,6 +34,7 @@ PROFILE
 airoot=$profile/airootfs
 mkdir -p "$airoot/usr/share/tessarchy/session" "$airoot/usr/bin" "$airoot/usr/share/wayland-sessions"
 cp -R -- "$root/shell" "$airoot/usr/share/tessarchy/"
+cp -R -- "$root/docs" "$airoot/usr/share/tessarchy/"
 cp -- "$root/session/hyprland.lua" "$airoot/usr/share/tessarchy/session/"
 install -m755 "$root/session/start-tessarchy" "$root/session/tessera-shell" "$airoot/usr/bin/"
 install -m644 "$root/session/tessarchy.desktop" "$airoot/usr/share/wayland-sessions/"
@@ -49,6 +50,7 @@ find "$airoot/etc/systemd/system" -type l -name 'sshd.service' -delete
 mkdir -p "$airoot/etc/systemd/system/multi-user.target.wants"
 ln -sf /usr/lib/systemd/system/systemd-networkd.service "$airoot/etc/systemd/system/multi-user.target.wants/"
 ln -sf /usr/lib/systemd/system/systemd-resolved.service "$airoot/etc/systemd/system/multi-user.target.wants/"
+ln -sf /usr/lib/systemd/system/systemd-timesyncd.service "$airoot/etc/systemd/system/multi-user.target.wants/"
 ln -sf /run/systemd/resolve/stub-resolv.conf "$airoot/etc/resolv.conf"
 printf 'Tessarchy live prototype. tty1: tess autologin; no password login.\n' > "$airoot/etc/issue"
 echo "Profile staged: $profile"
