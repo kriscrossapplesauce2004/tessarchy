@@ -7,7 +7,7 @@ data=${XDG_DATA_HOME:-$HOME/.local/share}/tessarchy
 [[ $(cat "$data/.tessarchy-dev-install") == tessarchy-dev-v1 ]] || exit 1
 root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 # Preserve launchers edited since installation; report instead of deleting them.
-for launcher in start-tessarchy tessera-shell tessera-screenshot; do
+for launcher in start-tessarchy tessera-shell tessera-screenshot tessera-brightness tessera-nightlight; do
     target=$HOME/.local/bin/$launcher
     if [[ -e "$target" || -L "$target" ]]; then
         cmp -s -- "$root/session/$launcher" "$target" || {
@@ -15,7 +15,7 @@ for launcher in start-tessarchy tessera-shell tessera-screenshot; do
         }
     fi
 done
-rm -f -- "$HOME/.local/bin/start-tessarchy" "$HOME/.local/bin/tessera-shell" "$HOME/.local/bin/tessera-screenshot"
+rm -f -- "$HOME/.local/bin/start-tessarchy" "$HOME/.local/bin/tessera-shell" "$HOME/.local/bin/tessera-screenshot" "$HOME/.local/bin/tessera-brightness" "$HOME/.local/bin/tessera-nightlight"
 # Remove only installed files, never user preferences or unrelated files.
 # The tree mirrors the repository's shell/ directory, so uninstall adapts
 # automatically when the shell grows new files and never guesses at paths.

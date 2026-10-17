@@ -49,6 +49,27 @@ class Workflows(unittest.TestCase):
         self.assertEqual(preferences.read_text(), '-- mine')
         self.assertEqual(shell_settings.read_text(), '[Shell]\nlayoutMode=tablet\n')
 
+    def test_brightness_helper_validates_arguments(self):
+        helper = ROOT / 'session/tessera-brightness'
+        for args in ([], ['bogus'], ['get', 'extra'], ['set'], ['set', '0'], ['set', '101'],
+                     ['set', 'abc'], ['set', '-5'], ['step', '10']):
+            result = subprocess.run([str(helper), *args], env=self.env,
+                                    capture_output=True, text=True)
+            self.assertEqual(result.returncode, 64, args)
+
+    def test_nightlight_helper_validates_arguments(self):
+        import shutil
+        helper = ROOT / 'session/tessera-nightlight'
+        for args in ([], ['bogus'], ['on', 'extra'], ['off', 'extra'], ['status', 'extra']):
+            result = subprocess.run([str(helper), *args], env=self.env,
+                                    capture_output=True, text=True)
+            self.assertEqual(result.returncode, 64, args)
+        if shutil.which('hyprsunset') is None:
+            for args in (['status'], ['on']):
+                result = subprocess.run([str(helper), *args], env=self.env,
+                                        capture_output=True, text=True)
+                self.assertEqual(result.returncode, 3, args)
+
     def test_existing_launcher_refused_before_installing_data(self):
         launcher = self.home / '.local/bin/start-tessarchy'
         launcher.parent.mkdir(parents=True)
@@ -181,6 +202,10 @@ assert(binds["SUPER + mouse:272"].flags.mouse == true, "drag bind must be a mous
 assert(binds["SUPER + mouse:273"].flags.mouse == true, "resize bind must be a mouse bind")
 assert(binds["XF86AudioMute"].flags.locked == true and binds["XF86AudioMute"].flags.repeating == true,
     "volume keys must work on the lock screen and repeat")
+assert(binds["XF86MonBrightnessUp"] and binds["XF86MonBrightnessUp"].dispatcher.exec == "tessera-brightness up",
+    "brightness up binding missing")
+assert(binds["XF86MonBrightnessDown"] and binds["XF86MonBrightnessDown"].dispatcher.exec == "tessera-brightness down",
+    "brightness down binding missing")
 local function check(mode, width, height, scale, transform, floating, fullscreen, expected)
     local f = assert(io.open(os.getenv("XDG_CONFIG_HOME") .. "/tessarchy/shell.ini", "w"))
     f:write("[Other]\nlayoutMode=desktop\n[Shell]\nlayoutMode=" .. mode .. "\n")
@@ -287,9 +312,13 @@ check("phone", 400, 800, 1, 0, false, 2, 0)
         self.assertTrue((profile / 'airootfs/home/tess/.config/fish/config.fish').is_file())
         self.assertIn('/home/tess/.config/fish/config.fish', (profile / 'profiledef.sh').read_text())
         self.assertTrue((profile / 'airootfs/usr/bin/tessera-screenshot').stat().st_mode & 0o111)
+        self.assertTrue((profile / 'airootfs/usr/bin/tessera-brightness').stat().st_mode & 0o111)
+        self.assertTrue((profile / 'airootfs/usr/bin/tessera-nightlight').stat().st_mode & 0o111)
         packages = (profile / 'packages.x86_64').read_text().splitlines()
         self.assertIn('grim', packages)
         self.assertIn('libnotify', packages)
+        self.assertIn('brightnessctl', packages)
+        self.assertIn('hyprsunset', packages)
         self.assertIn('/usr/bin/tessera-screenshot', (profile / 'profiledef.sh').read_text())
         self.assertIn('u tess 1000', (profile / 'airootfs/etc/sysusers.d/tessarchy.conf').read_text())
         result = subprocess.run(command, env=env, capture_output=True, text=True)

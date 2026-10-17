@@ -73,6 +73,14 @@ The power panel reads UPower's
 display device reactively (percentage, charge state, time to empty/full, health
 when reported) and sets the power-profiles-daemon profile, disabling the
 performance button when the daemon reports no such profile.
+Brightness control probes the first backlight once at shell start (nothing is
+shown without one), writes through `session/tessera-brightness` (brightnessctl
+when present, else sysfs) with rapid changes coalesced into one call, and the
+brightness keys invoke the same helper, which is silent on machines with no
+backlight. The night-light toggle starts and stops hyprsunset through
+`session/tessera-nightlight` (pid file in the runtime directory, fixed 4000K
+command), hidden when hyprsunset is missing, and re-applied from the stored
+preference on shell start.
 No hardware Wi-Fi/modem control or secure locking is claimed.
 
 ## Notification delivery

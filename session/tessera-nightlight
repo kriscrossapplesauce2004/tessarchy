@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Turns hyprsunset night light on or off for the Tessera display controls.
+# Exit codes: 0 success, 1 off (status), 3 no hyprsunset, 64 invalid arguments.
+set -euo pipefail
+
+runtime=${XDG_RUNTIME_DIR:-/run/user/$UID}
+pidfile=$runtime/tessera-nightlight.pid
+temperature=${TESSARCHY_NIGHTLIGHT_TEMPERATURE:-4000}
+
+running() {
+    [[ -f "$pidfile" ]] || return 1
+    local pid
+    pid=$(cat -- "$pidfile")
+    [[ "$pid" =~ ^[0-9]+$ ]] || { rm -f -- "$pidfile"; return 1; }
+    kill -0 "$pid" 2>/dev/null || { rm -f -- "$pidfile"; return 1; }
+    return 0
+}
+
+case "${1:-}" in
+    on)
+        [[ $# -eq 1 ]] || { echo "usage: tessera-nightlight on" >&2; exit 64; }
+        command -v hyprsunset >/dev/null 2>&1 || exit 3
+        if running; then exit 0; fi
+        mkdir -p -- "$runtime"
+        nohup hyprsunset -t "$temperature" >/dev/null 2>&1 &
+        printf '%s\n' $! > "$pidfile"
+        ;;
+    off)
+        [[ $# -eq 1 ]] || { echo "usage: tessera-nightlight off" >&2; exit 64; }
+        if running; then
+            pid=$(cat -- "$pidfile")
+            kill "$pid" 2>/dev/null || true
+            rm -f -- "$pidfile"
+        fi
+        ;;
+    status)
+        [[ $# -eq 1 ]] || { echo "usage: tessera-nightlight status" >&2; exit 64; }
+        command -v hyprsunset >/dev/null 2>&1 || exit 3
+        if running; then
+            echo on
+            exit 0
+        fi
+        echo off
+        exit 1
+        ;;
+    *)
+        echo "usage: tessera-nightlight on | off | status" >&2
+        exit 64
+        ;;
+esac

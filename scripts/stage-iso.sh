@@ -30,6 +30,8 @@ file_permissions+=(
   ["/usr/bin/start-tessarchy"]="0:0:755"
   ["/usr/bin/tessera-shell"]="0:0:755"
   ["/usr/bin/tessera-screenshot"]="0:0:755"
+  ["/usr/bin/tessera-brightness"]="0:0:755"
+  ["/usr/bin/tessera-nightlight"]="0:0:755"
 )
 PROFILE
 airoot=$profile/airootfs
@@ -37,7 +39,7 @@ mkdir -p "$airoot/usr/share/tessarchy/session" "$airoot/usr/bin" "$airoot/usr/sh
 cp -R -- "$root/shell" "$airoot/usr/share/tessarchy/"
 cp -R -- "$root/docs" "$airoot/usr/share/tessarchy/"
 cp -- "$root/session/hyprland.lua" "$airoot/usr/share/tessarchy/session/"
-install -m755 "$root/session/start-tessarchy" "$root/session/tessera-shell" "$root/session/tessera-screenshot" "$airoot/usr/bin/"
+install -m755 "$root/session/start-tessarchy" "$root/session/tessera-shell" "$root/session/tessera-screenshot" "$root/session/tessera-brightness" "$root/session/tessera-nightlight" "$airoot/usr/bin/"
 install -m644 "$root/session/tessarchy.desktop" "$airoot/usr/share/wayland-sessions/"
 cp -a "$root/iso/airootfs/." "$airoot/"
 # Releng uses zsh for its root rescue login. Our smaller package set uses Bash.

@@ -34,6 +34,9 @@ live image is in development.
 - Translucent bars, Wi-Fi/cellular indicator slots, and an optional PipeWire
   audio panel with output-device switching, volume/mute, and per-app stream
   volumes. Wireless and modem backends remain to be connected.
+- Screen brightness in quick controls wherever a backlight exists, with
+  XF86MonBrightness keys wired to the same shipped helper, plus a persisted
+  hyprsunset night-light toggle (both shipped in the live image).
 - An expandable launcher for Firefox and Foot.
 - A scrollable window overview with application switching and maximize/restore.
 - A Desktop layout mode with a workspace strip, focused-window title, ordinary

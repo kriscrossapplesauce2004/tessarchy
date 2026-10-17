@@ -70,6 +70,9 @@ hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true, repeating = true })
 -- Full-screen capture through the shipped helper; it notifies on success.
 hl.bind("Print", hl.dsp.exec_cmd("tessera-screenshot"))
+-- Brightness keys use the shipped helper; it is silent without a backlight.
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("tessera-brightness up"), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("tessera-brightness down"), { locked = true, repeating = true })
 -- Preferences are user-owned, never installed over existing files.
 local home = os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")
 local preferences = home .. "/tessarchy/preferences.lua"

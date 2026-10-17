@@ -21,6 +21,8 @@ pipewire-pulse
 wireplumber
 upower
 power-profiles-daemon
+brightnessctl
+hyprsunset
 ttf-dejavu
 noto-fonts-emoji
 grim

@@ -29,6 +29,7 @@ ShellRoot {
         property real barOpacity: 0.32
         property real wallpaperDim: 0.12
         property bool doNotDisturb: false
+        property bool nightLight: false
     }
     // Bind these when wireless/modem integrations land. Never invent a signal.
     property real wifiStrength: -1
@@ -80,6 +81,7 @@ ShellRoot {
                 return;
             root.queuePopup(notification);
         }
+    }
     // One media player drives the status-bar indicator and the Quick controls
     // card: the playing player wins, otherwise the first connected one.
     readonly property var activePlayer: {
@@ -442,6 +444,27 @@ ShellRoot {
                                         color: "#f0f5ff"
                                         Layout.fillWidth: true
                                         wrapMode: Text.WordWrap
+                                    }
+                                    Text {
+                                        visible: brightnessControl.available || nightLightToggle.available
+                                        text: "DISPLAY"
+                                        color: "#8da7b9"
+                                        font {
+                                            pixelSize: 11
+                                            letterSpacing: 2
+                                        }
+                                    }
+                                    BrightnessControl {
+                                        id: brightnessControl
+                                        Layout.fillWidth: true
+                                        accentColor: root.accentColor
+                                    }
+                                    NightLightToggle {
+                                        id: nightLightToggle
+                                        Layout.fillWidth: true
+                                        accentColor: root.accentColor
+                                        nightLight: shellPreferences.nightLight
+                                        onNightLightChanged: shellPreferences.nightLight = nightLight
                                     }
                                     Text {
                                         text: "SOUND"

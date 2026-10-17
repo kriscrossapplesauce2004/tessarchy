@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Reads or sets the first backlight device for Tessera's brightness control.
+# Exit codes: 0 success, 3 no usable backlight, 64 invalid arguments.
+set -euo pipefail
+
+find_backlight() {
+    local dir
+    for dir in /sys/class/backlight/*; do
+        if [[ -r "$dir/brightness" && -r "$dir/max_brightness" ]]; then
+            printf '%s\n' "$dir"
+            return 0
+        fi
+    done
+    return 3
+}
+
+current_percent() {
+    local dir current max
+    dir=$(find_backlight) || return 3
+    current=$(cat -- "$dir/brightness")
+    max=$(cat -- "$dir/max_brightness")
+    [[ "$max" =~ ^[0-9]+$ && "$max" -gt 0 ]] || return 3
+    printf '%s\n' $(( current * 100 / max ))
+}
+
+set_percent() {
+    local percent=$1 dir max
+    if [[ ! "$percent" =~ ^[0-9]+$ || "$percent" -lt 1 || "$percent" -gt 100 ]]; then
+        echo "tessera-brightness: percentage must be an integer from 1 to 100" >&2
+        return 64
+    fi
+    if command -v brightnessctl >/dev/null 2>&1; then
+        brightnessctl --quiet set "${percent}%" >/dev/null
+        return 0
+    fi
+    dir=$(find_backlight) || return 3
+    max=$(cat -- "$dir/max_brightness")
+    printf '%s\n' $(( max * percent / 100 )) > "$dir/brightness"
+}
+
+step() {
+    local delta=$1 current target
+    current=$(current_percent) || return 3
+    target=$(( current + delta ))
+    if (( target < 1 )); then target=1; fi
+    if (( target > 100 )); then target=100; fi
+    set_percent "$target"
+}
+
+case "${1:-}" in
+    get)
+        [[ $# -eq 1 ]] || { echo "usage: tessera-brightness get" >&2; exit 64; }
+        current_percent
+        ;;
+    set)
+        [[ $# -eq 2 ]] || { echo "usage: tessera-brightness set <1-100>" >&2; exit 64; }
+        set_percent "$2"
+        ;;
+    up) step 10 ;;
+    down) step -10 ;;
+    *)
+        echo "usage: tessera-brightness get | set <1-100> | up | down" >&2
+        exit 64
+        ;;
+esac

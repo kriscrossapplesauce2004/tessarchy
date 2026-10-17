@@ -458,3 +458,33 @@ then booted diskless in QEMU (TCG, no KVM; q35, virtio-vga, 2 GB) with
   reachability inside the guest, notification/tray interactions, session exit
   and restart from the shipped image, and anything requiring a battery. Runs
   were software-emulated; real-hardware boot still needs a physical test.
+## Screen brightness control, 2026-10-17
+
+Implemented, static validation only; backlight validation pending.
+
+- `session/tessera-brightness` reads (`get`), writes (`set 1-100`) and steps
+  (`up`/`down` by 10%) the first backlight device, preferring `brightnessctl`
+  (added to the live image) and falling back to sysfs. Invalid arguments exit
+  64 before touching any device; a machine with no backlight exits 3.
+- Quick controls gains a DISPLAY section that probes once at shell start and
+  stays hidden unless a percentage comes back; slider and −/Dim/Bright/+
+  controls coalesce rapid changes into one helper call. XF86MonBrightnessUp/
+  Down are bound to the helper in `session/hyprland.lua`.
+- Validation: argument-validation cases for all bad invocations (13/13
+  workflow tests), a Lua binding assertion that both brightness keys dispatch
+  `tessera-brightness up/down`, staging asserts the helper is executable and
+  `brightnessctl` ships in the image, and install/uninstall round-trips remove
+  every new file. 25/25 Qt Quick results on the dev host.
+- `session/tessera-nightlight` manages hyprsunset through a runtime pid
+  file with on/off/status, validates arguments before touching anything, and
+  exits 3 when hyprsunset is absent; the DISPLAY section shows a persisted
+  night-light toggle once a probe sees the helper and backend, and the pref
+  re-applies on shell start.
+- Validation adds: bad-argument exit codes for both helpers, a
+  hyprsunset-absent `status`/`on` exit-3 check, staging asserts both helpers
+  are executable and `brightnessctl`/`hyprsunset` ship in the image, and the
+  install/uninstall round-trip removes every new file (13/13 workflow tests).
+- Not performed: actual backlight reads/writes (this host has no backlight),
+  key repeat behavior on hardware, a real hyprsunset run (the toggle path was
+  validated only up to "binary missing"), and interaction with a real
+  integrated panel. These remain on the manual list.
