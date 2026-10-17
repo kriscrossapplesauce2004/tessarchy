@@ -605,3 +605,49 @@ Implemented, static and unit validation only; live association pending.
   SSIDs, roaming and signal accuracy. The dev host and the tester ISO run
   systemd-networkd with no NetworkManager, so this panel is inert there (and
   hidden, by design) until NetworkManager is installed and running.
+
+## Build 6 and live ISO boots, 2026-10-17 UTC
+
+Builds 4 and 5 booted Hyprland but the shell never appeared: the sheltered
+screenshots showed only Hyprland's empty-backdrop text at 600 s. A diagnostic
+ISO (same tree; journald forwarded to the serial console and the autostart
+line piped through `logger`) recorded the exact cause:
+
+    ERROR: Failed to load configuration
+    ERROR:   caused by @shell.qml[282:54]: Type SettingsPage unavailable
+    ERROR:   caused by @components/SettingsPage.qml[118:5]: Type RotationControl unavailable
+    ERROR:   caused by @components/RotationControl.qml[12:5]: Cannot override FINAL property
+
+`RotationControl` declared a property named `transform`, and `Item.transform`
+is final in Qt Quick; the failed instantiation aborted the whole `ShellRoot`,
+so no surfaces existed and Hyprland only painted its backdrop. Fixed on
+feat/rotation (rename to `currentTransform`, commit 4c5ace4) and merged into
+integration (e56572f). A grep across `shell/` found no other final-property
+collisions. The QML harness cannot instantiate Quickshell components (no
+Quickshell runtime on the dev host), so this class of defect is caught by the
+serial-console ISO boot, not by `scripts/check.sh`.
+
+Build 6 rebuilt the fixed integration tree (`scripts/stage-iso.sh` +
+`mkarchiso` inside an `archlinux:base` container, same as build 5). ISO
+`dist/tessarchy-0.1.0-20261017-x86_64.iso`, 1088454656 bytes, sha256
+`d36dc99221231e39a03add2b384899c44805a0e027dae01822a7d5307fb43d78`.
+
+Observed on this host, all with software emulation (TCG; no KVM):
+
+- Diagnostic build-6 ISO, serial log: `INFO: Launching config`, `INFO:
+  Configuration Loaded`, and the only ERROR line is
+  `quickshell.network: Network will not work. Could not find an available
+  backend.` (expected: the ISO has no NetworkManager; the Wi-Fi panel shows
+  its explicit no-backend state).
+- Diagnostic build-6 ISO, 1200 s capture: full Tessera shell rendered.
+- Unmodified build-6 ISO, BIOS, 1200 s capture: full Tessera shell rendered.
+- Unmodified build-6 ISO, UEFI (OVMF), 1200 s capture: full Tessera shell
+  rendered.
+
+Timing note: under TCG the shell can appear as late as ~600-700 s after
+power-on, so a 600 s capture window can photograph boot mid-initialization
+and produce a false negative. Build 6 was verified with a 1200 s window.
+
+Not performed: booting with KVM, physical hardware, or a rotated physical
+display; NetworkManager association on the ISO (the image intentionally runs
+systemd-networkd).
