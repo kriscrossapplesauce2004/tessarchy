@@ -376,3 +376,21 @@ Implemented, static validation only; live-player acceptance pending.
 - Not performed: a real MPRIS player in a live session (play/pause, seek,
   player switching), and long titles eliding on narrow bars. These stay on the
   manual list. MPRIS metadata is untrusted text, displayed only.
+## Live window previews in the app switcher, 2026-10-17
+
+Implemented, static validation only; live-compositor rendering pending.
+
+- The Recent apps page is now a grid of window cards. Each card holds a
+  `ScreencopyView` (Quickshell.Wayland, verified in 0.3.1 source) bound to the
+  window's `wayland` handle with `live: false`; a snapshot is captured when
+  the page opens, when Refresh previews is tapped, and after maximize/restore.
+  Windows the compositor cannot copy keep `hasContent` false and show their
+  title in place of the preview, so a failed capture is a visible fallback,
+  not an empty card. Card columns reuse `Policy.columns`.
+- The active window keeps its accent border; activation, maximize/restore and
+  confirmed close are unchanged below the preview.
+- `qmllint` exits 0 for the changed shell; 10/10 workflow tests pass and the
+  Qt Quick suite is unaffected (17 results on the dev host).
+- Not performed: capturing real windows under Hyprland (protocol support,
+  hidden-window behavior, frame size/aspect), preview freshness across window
+  moves, and memory/perf with many windows. These stay on the manual list.
