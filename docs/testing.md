@@ -432,3 +432,29 @@ Implemented, static validation only; hardware validation pending.
 - Not performed: an actual battery (charge-state transitions, time estimates,
   health), profile switching visibly changing CPU behavior, and behavior when
   upower or power-profiles-daemon are absent. These remain on the manual list.
+
+## Live ISO boot in QEMU, 2026-10-17
+
+Performed on this machine: a full live ISO was built in a Docker `archlinux:base`
+container under x86_64 emulation (binfmt) from `integration/live-iso`
+(phone-shell plus desktop mode, bundled fish, rootfs hardening, portable checks),
+then booted diskless in QEMU (TCG, no KVM; q35, virtio-vga, 2 GB) with
+`scripts/boot-test-iso.py`, once per firmware.
+
+- BIOS (SeaBIOS/isolinux) and UEFI (OVMF 4M, systemd-boot): both complete the
+  archiso boot and autologin `tess` on tty1; `.bash_profile` starts
+  `start-tessarchy`, Hyprland starts, and Tessera renders the full shell.
+- The 600-second captures show the desktop layout end to end: clock and
+  workspace strip (desktop-mode feature) in the status bar, tray and battery
+  indicators, the animated logo with the "Auto · Desktop · Change" pill, the
+  tessellated wallpaper, and the Apps/Windows/Settings dock with its touch
+  targets. Screenshots: `build/boot-bios/final.png`, `build/boot-uefi/final.png`;
+  serial logs and QMP status files sit beside them. BIOS and UEFI renders are
+  pixel-identical.
+- The ISO used: `dist/tessarchy-0.1.0-20261017-x86_64-baseline.iso`, sha256
+  `2c753f5d574a10656c047d8992327d3f185243e2dd50eaa5940e77050d608cfd`,
+  built from commit `ee3ed5f`'s parent line (`integration/live-iso`).
+- Not performed: hardware boot (the VM's virtio peripherals only), network
+  reachability inside the guest, notification/tray interactions, session exit
+  and restart from the shipped image, and anything requiring a battery. Runs
+  were software-emulated; real-hardware boot still needs a physical test.
