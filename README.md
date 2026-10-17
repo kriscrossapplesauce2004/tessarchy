@@ -9,9 +9,10 @@ opinionated experience, Tessarchy is developing its own mobile-focused session.
 
 The first target is an x86_64 QEMU/KVM guest, followed by touchscreen tablets.
 Selected ARM devices are a later goal with explicit hardware support. The
-project currently ships session source and development tooling; a standalone
-live image is in development.
+project ships session source, development tooling and an experimental x86_64
+live tester ISO.
 
+[Download the tester ISO](https://github.com/thediamondsaint/tessarchy/releases/tag/v0.1.0-alpha.1) ·
 [Getting started](#quick-start-use-the-basic-arch-vm) ·
 [Architecture](docs/architecture.md) ·
 [Roadmap](docs/roadmap.md) ·
@@ -37,6 +38,8 @@ live image is in development.
 - Screen brightness in quick controls wherever a backlight exists, with
   XF86MonBrightness keys wired to the same shipped helper, plus a persisted
   hyprsunset night-light toggle (both shipped in the live image).
+- The panel blanks after five idle minutes (hypridle, shipped in the live
+  image) and wakes on any input, with no lock screen and no locking claims.
 - An expandable launcher for Firefox and Foot.
 - A scrollable window overview with application switching and maximize/restore.
 - A Desktop layout mode with a workspace strip, focused-window title, ordinary
@@ -61,7 +64,9 @@ QEMU guest. Ten workflow tests, Qt Quick layout/motion checks, and available
 static checks pass.
 Detailed touchscreen, scaling, focus, and window-action acceptance tests remain
 pending. Two development packages have been built locally; they are not yet
-published releases. **No Tessarchy ISO has been boot-tested or released.**
+published packages. The [Alpha 1 tester ISO](https://github.com/thediamondsaint/tessarchy/releases/tag/v0.1.0-alpha.1)
+has been published and observed booting into Tessera in BIOS and UEFI QEMU/KVM.
+It is a disposable live environment, not an installer or a hardware-certified release.
 
 Text input currently requires a physical keyboard. New ordinary windows maximize
 in Phone/Tablet modes and start tiled in Desktop mode. Existing windows stay in
@@ -75,7 +80,8 @@ difference between implemented, user-tested, and planned behavior.
 
 The basic Arch qcow2 is now the preferred development route. The user has
 confirmed that the basic Arch image boots and Tessera runs in that guest.
-Detailed touch/device acceptance testing and ISO boot testing remain pending.
+Detailed touch/device acceptance testing remains pending. The separate tester
+ISO has a BIOS/UEFI graphical boot smoke test; see the release validation notes.
 
 Shut down the current guest with `sudo poweroff`. From the host repository:
 

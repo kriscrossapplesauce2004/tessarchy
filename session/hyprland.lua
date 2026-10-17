@@ -38,6 +38,10 @@ hl.on("window.open", function(window)
 end)
 hl.on("hyprland.start", function ()
     hl.exec_cmd("tessera-shell")
+    -- Blank the panel after five minutes of inactivity; any input wakes it.
+    -- hypridle respects idle inhibitors, and no lock command is configured.
+    local share = os.getenv("TESSARCHY_DATA_DIR") or "/usr/share/tessarchy"
+    hl.exec_cmd('hypridle -c "' .. share .. '/session/hypridle.conf" &')
 end)
 hl.bind("SUPER + Return", hl.dsp.exec_cmd("foot"))
 hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }))

@@ -93,6 +93,9 @@ def main():
                     if second > args.seconds:
                         continue
                     time.sleep(max(0, second - (time.monotonic() - start)))
+                    # Wake a blanked panel so idle timeouts cannot hide the shell.
+                    execute('human-monitor-command', {'command-line': 'sendkey ret'})
+                    time.sleep(1)
                     name = 'final' if second == args.seconds else str(second)
                     ppm = output / (name + '.ppm')
                     execute('screendump', {'filename': str(ppm)})

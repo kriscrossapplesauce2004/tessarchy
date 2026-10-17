@@ -22,6 +22,6 @@ rm -f -- "$HOME/.local/bin/start-tessarchy" "$HOME/.local/bin/tessera-shell" "$H
 while IFS= read -r -d '' relative; do
     rm -f -- "$data/shell/$relative"
 done < <(cd -- "$root/shell" && find . -type f -printf '%P\0')
-rm -f -- "$data/session/hyprland.lua" "$data/.tessarchy-dev-install"
+rm -f -- "$data/session/hyprland.lua" "$data/session/hypridle.conf" "$data/.tessarchy-dev-install"
 rmdir -- "$data/shell/artwork" "$data/shell/icons" "$data/shell/components" "$data/shell" "$data/session" "$data" 2>/dev/null || true
 echo "Development copy removed. ~/.config/tessarchy preferences retained."

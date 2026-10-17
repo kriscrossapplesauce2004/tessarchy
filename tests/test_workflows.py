@@ -170,10 +170,11 @@ class Workflows(unittest.TestCase):
             self.skipTest('Lua interpreter unavailable')
         folder = self.home / 'config/tessarchy'
         folder.mkdir(parents=True)
-        script = r'''local callbacks, actions, binds = {}, {}, {}
+        script = r'''local callbacks, actions, binds, execs = {}, {}, {}, {}
 hl = {
     monitor = function() end, config = function() end,
     bind = function(keys, dispatcher, flags) binds[keys] = { dispatcher = dispatcher, flags = flags } end,
+    exec_cmd = function(command) table.insert(execs, command) end,
     on = function(name, callback) callbacks[name] = callback end,
     dispatch = function(action) table.insert(actions, action) end,
     dsp = { exec_cmd = function(command) return { exec = command } end, exit = function() end,
@@ -206,6 +207,15 @@ assert(binds["XF86MonBrightnessUp"] and binds["XF86MonBrightnessUp"].dispatcher.
     "brightness up binding missing")
 assert(binds["XF86MonBrightnessDown"] and binds["XF86MonBrightnessDown"].dispatcher.exec == "tessera-brightness down",
     "brightness down binding missing")
+assert(callbacks["hyprland.start"], "missing hyprland.start autostart")
+callbacks["hyprland.start"]()
+local shell, idle = 0, 0
+for _, command in ipairs(execs) do
+    if command:match("tessera%-shell") then shell = shell + 1 end
+    if command:match("hypridle") then idle = idle + 1 end
+end
+assert(shell == 1, "tessera-shell must start exactly once from the session config")
+assert(idle == 1, "hypridle must start exactly once from the session config")
 local function check(mode, width, height, scale, transform, floating, fullscreen, expected)
     local f = assert(io.open(os.getenv("XDG_CONFIG_HOME") .. "/tessarchy/shell.ini", "w"))
     f:write("[Other]\nlayoutMode=desktop\n[Shell]\nlayoutMode=" .. mode .. "\n")
@@ -320,9 +330,19 @@ check("phone", 400, 800, 1, 0, false, 2, 0)
         self.assertIn('brightnessctl', packages)
         self.assertIn('hyprsunset', packages)
         self.assertIn('/usr/bin/tessera-screenshot', (profile / 'profiledef.sh').read_text())
+        self.assertTrue((profile / 'airootfs/usr/share/tessarchy/session/hypridle.conf').is_file())
+        self.assertIn('hypridle', (profile / 'packages.x86_64').read_text())
         self.assertIn('u tess 1000', (profile / 'airootfs/etc/sysusers.d/tessarchy.conf').read_text())
         result = subprocess.run(command, env=env, capture_output=True, text=True)
         self.assertNotEqual(result.returncode, 0)
+
+    def test_idle_config_blanks_screen_without_locking(self):
+        config = (ROOT / 'session/hypridle.conf').read_text()
+        self.assertIn('timeout = 300', config)
+        self.assertIn('on-timeout = hyprctl dispatch dpms off', config)
+        self.assertIn('on-resume = hyprctl dispatch dpms on', config)
+        self.assertNotIn('lock_cmd', config)
+        self.assertNotIn('swaylock', config)
 
 
 if __name__ == '__main__':

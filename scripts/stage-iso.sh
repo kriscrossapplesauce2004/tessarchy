@@ -38,7 +38,7 @@ airoot=$profile/airootfs
 mkdir -p "$airoot/usr/share/tessarchy/session" "$airoot/usr/bin" "$airoot/usr/share/wayland-sessions"
 cp -R -- "$root/shell" "$airoot/usr/share/tessarchy/"
 cp -R -- "$root/docs" "$airoot/usr/share/tessarchy/"
-cp -- "$root/session/hyprland.lua" "$airoot/usr/share/tessarchy/session/"
+cp -- "$root/session/hyprland.lua" "$root/session/hypridle.conf" "$airoot/usr/share/tessarchy/session/"
 install -m755 "$root/session/start-tessarchy" "$root/session/tessera-shell" "$root/session/tessera-screenshot" "$root/session/tessera-brightness" "$root/session/tessera-nightlight" "$airoot/usr/bin/"
 install -m644 "$root/session/tessarchy.desktop" "$airoot/usr/share/wayland-sessions/"
 cp -a "$root/iso/airootfs/." "$airoot/"

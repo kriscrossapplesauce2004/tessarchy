@@ -80,7 +80,12 @@ brightness keys invoke the same helper, which is silent on machines with no
 backlight. The night-light toggle starts and stops hyprsunset through
 `session/tessera-nightlight` (pid file in the runtime directory, fixed 4000K
 command), hidden when hyprsunset is missing, and re-applied from the stored
-preference on shell start.
+preference on shell start. Screen idle behavior is owned by
+hypridle, started from the session's `hyprland.start` hook with Tessarchy's own
+config: after 300 seconds without input it runs `hyprctl dispatch dpms off`,
+and the next input brings the panel back. It honors idle inhibitors, configures
+no lock command. No hardware Wi-Fi/modem control is claimed.
+
 No hardware Wi-Fi/modem control or secure locking is claimed.
 
 ## Notification delivery

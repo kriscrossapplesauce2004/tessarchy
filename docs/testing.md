@@ -516,3 +516,54 @@ Performed on this machine after the baseline boot above, same method.
 - Not performed: interacting with the new panels in the guest (quick
   controls taps, a real `notify-send`), guest networking, and hardware
   boot. These stay on the manual list.
+## First published tester ISO, 2026-10-17 UTC
+
+Actually performed:
+
+- Fixed CI-only ShellCheck findings and archiso's package manifest collection
+  path. The hosted CI ShellCheck step now passes; unavailable GUI/Lua tools in
+  the Ubuntu pre-build check are explicitly skipped, not counted as passing.
+- Actions run 38997819650 built the ISO in a disposable Arch container using
+  archiso 91-1 from source commit `90c5eee58f8be68ae9b9a670c3479f0ff453449b`.
+  Included versions: Hyprland 0.56.2-4, Quickshell 0.3.2-1, Linux
+  7.2.10.arch1-1 and Mesa 1:26.2.4-1. No host dependencies were installed.
+- The ISO is 1,070,628,864 bytes. SHA-256:
+  `7bdacc213975c3c1b863100eff4686973d1a315389f6360ee4c7d3af68842608`.
+  Verification passed in CI and matches GitHub's uploaded asset digest.
+- Two diskless QEMU/KVM VMs (2 GiB, 2 vCPUs, virtio-vga, no NIC) booted the
+  exact image through BIOS and non-Secure-Boot UEFI. The agent visually
+  inspected both final screenshots at 90 seconds: each shows the Tessera GUI,
+  wallpaper, clock, logo, status bar, mode badge and navigation after autologin.
+  The first 120-second TCG attempts only reached Linux userspace, so they were
+  not treated as graphical boot passes. Full capture evidence is attached.
+- Published [v0.1.0-alpha.1](https://github.com/thediamondsaint/tessarchy/releases/tag/v0.1.0-alpha.1)
+  as a prerelease with ISO, SHA256SUMS, package/build provenance and boot notes.
+  The ISO is a release asset, never a Git-tracked binary.
+
+Still pending for this exact ISO: app launch/actions, networking, audio, actual
+touch hardware, multiple monitors, session exit, physical-device compatibility
+and persistence acceptance. The installed development VM's broader tests above
+do not establish these as passing in the ISO. No secure locking or Secure Boot
+support claim. Testers should begin in a disposable VM with a physical keyboard.
+
+## Idle screen blanking, 2026-10-17
+
+Implemented, static validation only; live idle-cycle acceptance pending.
+
+- `session/hypridle.conf` configures one listener: 300 seconds to
+  `hyprctl dispatch dpms off` and `dpms on` on resume, with no lock command.
+  `session/hyprland.lua` starts `hypridle` with that config from the existing
+  `hyprland.start` autostart (the `tessarchy-hypridle` path resolution uses
+  `TESSARCHY_DATA_DIR` with the `/usr/share/tessarchy` fallback, and the whole
+  line is a fixed string plus that path - nothing user-supplied).
+- `scripts/boot-test-iso.py` now presses Enter before every capture, so a
+  blanked panel cannot masquerade as a failed boot in later evidence runs.
+- Validation: a Lua stub test invokes the session's `hyprland.start` callback
+  and asserts exactly one `tessera-shell` and one `hypridle` exec; a config
+  test asserts the timeout, both dpms commands, and the absence of
+  `lock_cmd`/`swaylock`; the staging test asserts `hypridle.conf` lands under
+  `/usr/share/tessarchy/session/` and `hypridle` joins the image packages.
+  11/11 workflow tests pass on the dev host.
+- Not performed: a real idle cycle (panel actually off after five minutes and
+  waking on input), inhibitor behavior with video players, and hypridle's
+  behavior when `hyprctl` is missing. These remain on the manual list.
