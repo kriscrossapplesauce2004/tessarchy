@@ -488,3 +488,31 @@ Implemented, static validation only; backlight validation pending.
   key repeat behavior on hardware, a real hyprsunset run (the toggle path was
   validated only up to "binary missing"), and interaction with a real
   integrated panel. These remain on the manual list.
+
+## Full-feature image boot and a merge regression, 2026-10-17
+
+Performed on this machine after the baseline boot above, same method.
+
+- The integration branch merged the remaining feature branches (media
+  controls, window previews, audio panel, power panel, display controls).
+  Rebuilding exposed a real defect introduced by the media-controls
+  integration merge: the in-shell `NotificationServer` lost its closing
+  brace, so the rest of the shell file ended one nesting level deep.
+  `qmllint` reported the resulting parse error, and the first 600-second
+  boot of the full-feature image showed the shell not rendering at all
+  (black screen with only a cursor). The fix was one brace in the
+  integration tree (feature branches were unaffected; every PR branch
+  parses), verified by `qmllint` and a rebuilt image.
+- The rebuilt full-feature ISO booted on both firmwares with the full
+  desktop shell rendering: workspace strip, tray, battery indicator,
+  clock, dock and wallpaper, matching the baseline layout (renders differ
+  only in the clock/date text). Screenshots: `build/boot3-bios/final.png`,
+  `build/boot3-uefi/final.png` (copies under evidence for PR comments).
+- The full-feature ISO used: `dist/tessarchy-0.1.0-20261017-x86_64.iso`,
+  sha256 `88a30d4f5105a0862375946060b94538cfdb8c382300e5d4b41dd1a4c613d57e`,
+  from integration commit `5d22892` (all eight feature branches merged,
+  `brightnessctl`/`hyprsunset`/`upower`/`power-profiles-daemon` present in
+  `dist/packages.txt`).
+- Not performed: interacting with the new panels in the guest (quick
+  controls taps, a real `notify-send`), guest networking, and hardware
+  boot. These stay on the manual list.
