@@ -413,3 +413,22 @@ Implemented, static validation only; live-audio validation pending.
   live PipeWire server (routing actually moving audio, device hotplug, real
   app streams appearing/disappearing, behavior when the default sink changes
   while the page is open). These remain on the manual list.
+## Power panel, 2026-10-17
+
+Implemented, static validation only; hardware validation pending.
+
+- Quick controls gains a POWER section (`shell/components/PowerPanel.qml`):
+  battery percentage with charge state (charging, discharging, fully charged,
+  empty, pending) and estimated time left or to full via the new
+  `Policy.duration` helper, battery health when UPower reports it, and
+  Save/Balanced/Performance buttons writing `PowerProfiles.profile`. The
+  Performance button is disabled when the daemon reports no performance
+  profile, and a machine without a battery shows "No battery · on AC power".
+- The live ISO now includes `upower` and `power-profiles-daemon`, so battery
+  state and power modes can work on real hardware, not only in development.
+- 10/10 workflow tests and 16/16 Qt Quick results pass on the dev host,
+  including the new `Policy.duration` edge cases. `qmllint` reports only the
+  Quickshell singletons it cannot resolve on this host.
+- Not performed: an actual battery (charge-state transitions, time estimates,
+  health), profile switching visibly changing CPU behavior, and behavior when
+  upower or power-profiles-daemon are absent. These remain on the manual list.

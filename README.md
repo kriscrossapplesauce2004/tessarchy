@@ -22,6 +22,9 @@ live image is in development.
 
 - A top status bar with clock, registered tray icons, battery status when available,
   and session controls.
+- A power panel in quick controls: battery charge state, time left/to full, and
+  health when a battery is present, plus power-mode selection through
+  power-profiles-daemon (shipped in the live image).
 - Automatic Phone/Tablet/Desktop shell layouts with a saved manual override.
 - A persistent navigation bar with 56px touch targets and a compact desktop dock.
 - An original mint-and-navy wallpaper, animated tessellated logo, and responsive

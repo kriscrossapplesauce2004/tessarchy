@@ -573,6 +573,18 @@ ShellRoot {
                                             }
                                         }
                                     }
+                                    Text {
+                                        text: "POWER"
+                                        color: "#8da7b9"
+                                        font {
+                                            pixelSize: 11
+                                            letterSpacing: 2
+                                        }
+                                    }
+                                    PowerPanel {
+                                        Layout.fillWidth: true
+                                        accentColor: root.accentColor
+                                    }
                                 }
                                 RowLayout {
                                     visible: panel.page === "status"

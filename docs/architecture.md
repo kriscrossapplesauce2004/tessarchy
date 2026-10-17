@@ -69,6 +69,10 @@ only when the service socket exists at launch; its quick-controls panel
 switches the default output via `Pipewire.preferredDefaultAudioSink`, controls
 the default sink's volume and mute, and lists playback streams with per-app
 volume and mute, keeping every displayed node alive with `PwObjectTracker`.
+The power panel reads UPower's
+display device reactively (percentage, charge state, time to empty/full, health
+when reported) and sets the power-profiles-daemon profile, disabling the
+performance button when the daemon reports no such profile.
 No hardware Wi-Fi/modem control or secure locking is claimed.
 
 ## Notification delivery

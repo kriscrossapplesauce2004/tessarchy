@@ -91,3 +91,13 @@ function playbackStream(mediaClass) {
 function volumePercent(value) {
     return Math.round(Math.max(0, Math.min(1, Number(value) || 0)) * 100);
 }
+function duration(seconds) {
+    const total = Math.floor(Number(seconds) || 0);
+    if (!isFinite(total) || total <= 0) return "";
+    if (total < 60) return "less than a minute";
+    let minutes = Math.round(total / 60);
+    const hours = Math.floor(minutes / 60);
+    minutes = minutes % 60;
+    if (hours > 0) return hours + "h " + String(minutes).padStart(2, "0") + "m";
+    return minutes + "m";
+}

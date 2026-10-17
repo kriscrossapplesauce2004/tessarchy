@@ -19,6 +19,8 @@ xdg-desktop-portal-gtk
 pipewire
 pipewire-pulse
 wireplumber
+upower
+power-profiles-daemon
 ttf-dejavu
 noto-fonts-emoji
 grim
