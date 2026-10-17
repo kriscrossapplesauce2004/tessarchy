@@ -438,6 +438,32 @@ ShellRoot {
                                     }
                                 }
                                 ColumnLayout {
+                                    visible: panel.page === "status"
+                                    Layout.fillWidth: true
+                                    spacing: 12
+                                    Text {
+                                        text: "SCREENSHOT"
+                                        color: "#8da7b9"
+                                        font {
+                                            pixelSize: 11
+                                            letterSpacing: 2
+                                        }
+                                    }
+                                    TouchButton {
+                                        text: "Capture this screen"
+                                        Layout.fillWidth: true
+                                        Accessible.name: "Take a full-screen screenshot"
+                                        onClicked: Quickshell.execDetached(["tessera-screenshot"])
+                                    }
+                                    Text {
+                                        text: "Saved to Pictures/Screenshots through grim, with a confirmation notification. The Print key does the same."
+                                        color: "#8da7b9"
+                                        font.pixelSize: 12
+                                        Layout.fillWidth: true
+                                        wrapMode: Text.WordWrap
+                                    }
+                                }
+                                ColumnLayout {
                                     visible: panel.page === "session"
                                     Layout.fillWidth: true
                                     Text {

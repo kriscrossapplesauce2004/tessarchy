@@ -40,9 +40,11 @@ class Workflows(unittest.TestCase):
                          (ROOT / 'shell/shell.qml').read_bytes())
         self.assertTrue((data / 'shell/components/NotificationCard.qml').is_file())
         self.assertTrue((data / 'shell/icons/bell.svg').is_file())
+        self.assertTrue((self.home / '.local/bin/tessera-screenshot').is_file())
         self.run_script('install-dev.sh', expected=1)
         self.run_script('uninstall-dev.sh')
         self.assertFalse(data.exists())
+        self.assertFalse((self.home / '.local/bin/tessera-screenshot').exists())
         self.assertEqual(sentinel.read_text(), 'existing config')
         self.assertEqual(preferences.read_text(), '-- mine')
         self.assertEqual(shell_settings.read_text(), '[Shell]\nlayoutMode=tablet\n')
@@ -207,6 +209,34 @@ check("phone", 400, 800, 1, 0, false, 2, 0)
                                 input=script, text=True, capture_output=True, env=self.env)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_screenshot_script_saves_png_and_notifies(self):
+        fakebin = self.home / 'bin'
+        fakebin.mkdir()
+        grim = fakebin / 'grim'
+        grim.write_text('#!/bin/bash\nprintf png > "$1"\n')
+        grim.chmod(0o755)
+        log = self.home / 'notify.log'
+        notifier = fakebin / 'notify-send'
+        notifier.write_text('#!/bin/bash\nprintf "%s\\n" "$@" > ' + str(log) + '\n')
+        notifier.chmod(0o755)
+        env = dict(self.env, PATH=str(fakebin) + ':' + os.environ['PATH'],
+                   XDG_PICTURES_DIR=str(self.home / 'pictures'))
+        result = subprocess.run([str(ROOT / 'session/tessera-screenshot')], env=env,
+                                capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        saved = Path(result.stdout.strip())
+        self.assertTrue(saved.is_file())
+        self.assertTrue(saved.parent.as_posix().endswith('/pictures/Screenshots'))
+        self.assertTrue(saved.name.startswith('tessarchy-') and saved.name.endswith('.png'))
+        self.assertEqual(saved.read_text(), 'png')
+        self.assertEqual(log.read_text().splitlines()[-1], saved.name)
+        self.assertIn('Screenshot saved', log.read_text())
+        grim.unlink()
+        result = subprocess.run([str(ROOT / 'session/tessera-screenshot')], env=env,
+                                capture_output=True, text=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('grim is required', result.stderr)
+
     def test_iso_staging_preserves_boot_assets_and_account_databases(self):
         # Minimal fixture exercises our assembly, not upstream archiso validity.
         repo = self.home / 'source'
@@ -256,6 +286,12 @@ check("phone", 400, 800, 1, 0, false, 2, 0)
         self.assertIn('fish', (profile / 'packages.x86_64').read_text().splitlines())
         self.assertTrue((profile / 'airootfs/home/tess/.config/fish/config.fish').is_file())
         self.assertIn('/home/tess/.config/fish/config.fish', (profile / 'profiledef.sh').read_text())
+        self.assertTrue((profile / 'airootfs/usr/bin/tessera-screenshot').stat().st_mode & 0o111)
+        packages = (profile / 'packages.x86_64').read_text().splitlines()
+        self.assertIn('grim', packages)
+        self.assertIn('libnotify', packages)
+        self.assertIn('/usr/bin/tessera-screenshot', (profile / 'profiledef.sh').read_text())
+        self.assertIn('u tess 1000', (profile / 'airootfs/etc/sysusers.d/tessarchy.conf').read_text())
         result = subprocess.run(command, env=env, capture_output=True, text=True)
         self.assertNotEqual(result.returncode, 0)
 

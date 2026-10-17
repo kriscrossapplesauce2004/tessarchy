@@ -336,3 +336,25 @@ Implemented, static validation only; live-session acceptance pending.
 - Not performed: running the shell against a live session bus, delivering a
   real `notify-send`, tapping cards, pop-up stacking on multiple outputs, and
   DND persistence across a restart. These stay on the manual list.
+## Screenshot helper and Print key, 2026-10-17
+
+Implemented with an injected-fake integration test; live-session acceptance
+pending.
+
+- `session/tessera-screenshot` refuses to run without grim, creates
+  `$XDG_PICTURES_DIR/Screenshots` (defaulting under the home directory),
+  generates a timestamped name itself, captures full screen, and sends a
+  "Screenshot saved" notification when notify-send exists. It never accepts a
+  path from the caller.
+- Quick controls gained a "Capture this screen" button; `session/hyprland.lua`
+  binds the Print key to the same helper. `tessera-shell` now puts its own
+  install directory first on PATH so the helper resolves for dev installs.
+- New workflow test stubs grim and notify-send, asserts the PNG lands in
+  Pictures/Screenshots with a tessarchy-*.png name, that the notification
+  names the file, and that removing grim fails cleanly with a message.
+  11/11 workflow tests pass; the install/uninstall test now covers the new
+  launcher, and the staging test covers grim/libnotify plus the installed
+  helper's executable bit and file_permissions entry.
+- Not performed: running grim against a live Hyprland session, the Print key
+  end-to-end, and the notification arriving through Tessera's own server
+  (available once the notification-center branch is in the same tree).

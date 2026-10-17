@@ -21,4 +21,6 @@ pipewire-pulse
 wireplumber
 ttf-dejavu
 noto-fonts-emoji
+grim
+libnotify
 dbus

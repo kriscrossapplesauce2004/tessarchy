@@ -14,6 +14,6 @@ done
 mkdir -p -- "$data/session" "$bin"
 cp -R -- "$root/shell" "$data/"
 cp -- "$root/session/hyprland.lua" "$data/session/"
-cp -- "$root/session/start-tessarchy" "$root/session/tessera-shell" "$bin/"
+cp -- "$root/session/start-tessarchy" "$root/session/tessera-shell" "$root/session/tessera-screenshot" "$bin/"
 printf '%s\n' 'tessarchy-dev-v1' > "$marker"
 echo "Installed to $data. From a local TTY: $bin/start-tessarchy"

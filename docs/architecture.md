@@ -31,6 +31,14 @@ is interpolated into IPC or a shell command. App launch uses
 Quickshell.execDetached([executable]) per action, so no shared Process can drop
 rapid clicks. Startup executables in the Lua config are fixed strings.
 
+Screenshots run through the shipped `tessera-screenshot` helper: Quick controls
+and the Print key both exec it by name (tessera-shell keeps the install
+directory on PATH). The helper refuses to run without grim, generates the
+output name itself inside `Pictures/Screenshots` (or `XDG_PICTURES_DIR`), never
+accepts a caller-supplied path, and sends a plain-text confirmation through the
+notification service, if installed. No user or application text reaches the
+command line.
+
 The Lua `window.open` handler reads the saved mode for each new ordinary window.
 It uses the same size thresholds, accounting for monitor scale/rotation. Mobile
 modes request maximization; Desktop leaves ordinary dwindle tiling. Floating

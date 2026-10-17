@@ -68,6 +68,8 @@ hl.bind("SUPER + mouse:273", hl.dsp.window.resize(), { mouse = true })
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true })
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true, repeating = true })
+-- Full-screen capture through the shipped helper; it notifies on success.
+hl.bind("Print", hl.dsp.exec_cmd("tessera-screenshot"))
 -- Preferences are user-owned, never installed over existing files.
 local home = os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")
 local preferences = home .. "/tessarchy/preferences.lua"

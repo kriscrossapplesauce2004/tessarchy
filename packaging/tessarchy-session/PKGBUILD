@@ -5,11 +5,14 @@ pkgdesc='Tessarchy prototype Hyprland session'
 arch=('any')
 license=('MIT')
 depends=('tessera-shell=0.1.0' 'hyprland>=0.56' 'dbus' 'firefox' 'foot' 'ttf-dejavu')
+optdepends=('grim: full-screen screenshots from Quick controls'
+            'libnotify: desktop notification after a screenshot')
 source=("tessarchy-$pkgver.tar.gz")
 sha256sums=('SKIP')
 package() {
     install -Dm644 "$srcdir/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
     install -Dm644 "$srcdir/session/hyprland.lua" "$pkgdir/usr/share/tessarchy/session/hyprland.lua"
     install -Dm755 "$srcdir/session/start-tessarchy" "$pkgdir/usr/bin/start-tessarchy"
+    install -Dm755 "$srcdir/session/tessera-screenshot" "$pkgdir/usr/bin/tessera-screenshot"
     install -Dm644 "$srcdir/session/tessarchy.desktop" "$pkgdir/usr/share/wayland-sessions/tessarchy.desktop"
 }

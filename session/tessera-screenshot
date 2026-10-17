@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Full-screen Wayland screenshot with a desktop notification.
+# Fixed paths only: the output name is generated here, never passed in.
+set -euo pipefail
+command -v grim >/dev/null || { echo "grim is required to take screenshots" >&2; exit 1; }
+directory=${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots
+mkdir -p -- "$directory"
+file=$directory/tessarchy-$(date +%Y%m%d-%H%M%S).png
+grim "$file"
+if command -v notify-send >/dev/null; then
+    notify-send -a Tessera "Screenshot saved" "$(basename -- "$file")" || true
+fi
+printf '%s\n' "$file"
