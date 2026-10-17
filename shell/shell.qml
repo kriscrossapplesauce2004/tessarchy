@@ -8,6 +8,7 @@ import Quickshell.Hyprland
 import Quickshell.Wayland
 import Quickshell.Services.UPower
 import Quickshell.Services.SystemTray
+import Quickshell.Networking
 import "components"
 import "LayoutPolicy.js" as Policy
 
@@ -28,7 +29,30 @@ ShellRoot {
         property real wallpaperDim: 0.12
     }
     // Bind these when wireless/modem integrations land. Never invent a signal.
-    property real wifiStrength: -1
+    readonly property bool networkBackend: Networking.backend !== NetworkBackendType.None
+    readonly property var wifiDevice: {
+        if (!root.networkBackend)
+            return null;
+        const devices = Networking.devices.values;
+        for (let i = 0; i < devices.length; i++) {
+            if (devices[i].type === DeviceType.Wifi)
+                return devices[i];
+        }
+        return null;
+    }
+    readonly property var wifiConnected: {
+        if (!root.wifiDevice)
+            return null;
+        const networks = root.wifiDevice.networks.values;
+        for (let i = 0; i < networks.length; i++) {
+            if (networks[i].connected)
+                return networks[i];
+        }
+        return null;
+    }
+    // Negative means no connected network; the status icon stays lit whenever
+    // a NetworkManager backend is present, so a disconnected radio still shows.
+    readonly property real wifiStrength: root.wifiConnected ? root.wifiConnected.signalStrength : -1
     property real cellularStrength: -1
     readonly property var audioSink: audioLoader.item ? (audioLoader.item as AudioStatus).sink : null
     readonly property bool audioAvailable: !!(audioSink && audioSink.ready && audioSink.audio)
@@ -269,11 +293,10 @@ ShellRoot {
                                             letterSpacing: 2
                                         }
                                     }
-                                    Text {
-                                        text: root.wifiStrength < 0 ? "Wi-Fi · unavailable" : "Wi-Fi · connected"
-                                        color: "#f0f5ff"
+                                    WifiPanel {
                                         Layout.fillWidth: true
-                                        wrapMode: Text.WordWrap
+                                        accentColor: root.accentColor
+                                        device: root.wifiDevice
                                     }
                                     Text {
                                         text: root.cellularStrength < 0 ? "Cellular · no modem connected" : "Cellular · connected"
@@ -492,6 +515,7 @@ ShellRoot {
                         symbol: "wifi"
                         label: "Wi-Fi"
                         strength: root.wifiStrength
+                        available: root.networkBackend
                     }
                     NavButton {
                         text: root.audioAvailable ? "Volume " + root.volumePercent + "%" : "Quick controls · audio unavailable"

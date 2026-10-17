@@ -267,3 +267,25 @@ touch hardware, multiple monitors, session exit, physical-device compatibility
 and persistence acceptance. The installed development VM's broader tests above
 do not establish these as passing in the ISO. No secure locking or Secure Boot
 support claim. Testers should begin in a disposable VM with a physical keyboard.
+
+## Wi-Fi quick controls, 2026-10-17 UTC
+
+Implemented, static and unit validation only; live association pending.
+
+- `WifiPanel.qml` drives `Quickshell.Networking`: radio toggle, visible-only
+  scanner, connected-first/strongest-first ordering, tap-to-connect for saved
+  or open networks and tap-to-disconnect for the connected one. The panel
+  disappears behind an explicit message when no NetworkManager backend is
+  running, and rows for unsaved secured networks stay disabled with a
+  "password required" label — no PSK is accepted until on-screen keyboard
+  text entry exists.
+- `StatusIcon` gained an `available` state so a present-but-disconnected radio
+  reads "disconnected" instead of the slashed "unavailable" glyph.
+- `Policy.signalPercent` and `Policy.wifiAction` unit cases cover clamping and
+  the connect/disconnect/none matrix; a workflow test asserts the Networking
+  import and wiring, the disabled-label path, that `connectWithPsk` never
+  appears, and the visible-only scanner.
+- Not performed: joining a real access point, wrong-password behavior, hidden
+  SSIDs, roaming and signal accuracy. The dev host and the tester ISO run
+  systemd-networkd with no NetworkManager, so this panel is inert there (and
+  hidden, by design) until NetworkManager is installed and running.

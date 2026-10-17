@@ -17,7 +17,7 @@ for launcher in start-tessarchy tessera-shell; do
 done
 rm -f -- "$HOME/.local/bin/start-tessarchy" "$HOME/.local/bin/tessera-shell"
 # Remove only installed files, never user preferences or unrelated files.
-rm -f -- "$data/shell/shell.qml" "$data/shell/components/TouchButton.qml" "$data/shell/components/NavButton.qml" "$data/shell/components/AppTile.qml" "$data/shell/components/StatusIcon.qml" "$data/shell/components/AudioStatus.qml" "$data/shell/components/BrandMark.qml" "$data/shell/components/SettingsPage.qml" "$data/shell/components/LevelSlider.qml" "$data/shell/LayoutPolicy.js"
+rm -f -- "$data/shell/shell.qml" "$data/shell/components/TouchButton.qml" "$data/shell/components/NavButton.qml" "$data/shell/components/AppTile.qml" "$data/shell/components/StatusIcon.qml" "$data/shell/components/AudioStatus.qml" "$data/shell/components/BrandMark.qml" "$data/shell/components/SettingsPage.qml" "$data/shell/components/LevelSlider.qml" "$data/shell/components/WifiPanel.qml" "$data/shell/LayoutPolicy.js"
 for icon in back home recents power browser terminal wifi cellular volume volume-muted battery settings phone tablet desktop auto controls; do rm -f -- "$data/shell/icons/$icon.svg"; done
 rm -f -- "$data/shell/artwork/aurora-fold.png" "$data/shell/artwork/tessarchy-mark.svg"
 for face in 0 1 2 3 4 5; do rm -f -- "$data/shell/artwork/mark-face-$face.svg"; done

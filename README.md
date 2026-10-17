@@ -30,7 +30,11 @@ live tester ISO.
 - Settings for layout mode, accent, opacity, wallpaper shade, clock, navigation
   labels, and reduced motion.
 - Translucent bars, Wi-Fi/cellular indicator slots, and optional PipeWire volume
-  controls. Wireless and modem backends remain to be connected.
+  controls. Where NetworkManager runs, Quick controls lists nearby Wi-Fi
+  networks with a radio toggle, the status bar shows live signal strength, and
+  saved or open networks connect with a tap. New secured networks still need a
+  profile created first (nmcli); password entry waits for the on-screen
+  keyboard. Cellular modem backends remain unconnected.
 - An expandable launcher for Firefox and Foot.
 - A scrollable window overview with application switching and maximize/restore.
 - Confirmation before closing a window or ending the session.
