@@ -9,20 +9,22 @@ ColumnLayout {
     property color accentColor: "#a9e8d5"
 
     readonly property var monitor: Hyprland.focusedMonitor
-    readonly property int transform: {
+    // Not named `transform`: QtQuick Item.transform is final and a colliding
+    // declaration makes this whole component fail to instantiate.
+    readonly property int currentTransform: {
         if (!control.monitor || !control.monitor.lastIpcObject)
             return 0;
         const value = control.monitor.lastIpcObject.transform;
         return Number.isInteger(value) && value >= 0 && value < 4 ? value : 0;
     }
-    readonly property string orientation: ["0°", "90°", "180°", "270°"][control.transform]
+    readonly property string orientation: ["0°", "90°", "180°", "270°"][control.currentTransform]
 
     spacing: 6
 
     function rotate() {
         if (!control.monitor)
             return;
-        const next = Policy.nextTransform(control.transform);
+        const next = Policy.nextTransform(control.currentTransform);
         // Fixed argv: the monitor name comes from the compositor and the
         // transform from our own cycle, so nothing user-supplied is parsed.
         Quickshell.execDetached(["hyprctl", "keyword", "monitor",
