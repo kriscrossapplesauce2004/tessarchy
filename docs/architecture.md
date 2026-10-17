@@ -39,6 +39,17 @@ accepts a caller-supplied path, and sends a plain-text confirmation through the
 notification service, if installed. No user or application text reaches the
 command line.
 
+Screen rotation uses Hyprland's runtime monitor keyword, not a dispatcher (the
+Lua dispatcher set in 0.56 has no keyword/monitor transform dispatch).
+`RotationControl.qml` reads the focused monitor's current transform from
+`lastIpcObject` and calls fixed-argv
+`Quickshell.execDetached(["hyprctl", "keyword", "monitor", name + ",transform," + n])`;
+the monitor name comes from the compositor and `n` from `Policy.nextTransform`
+(`(current + 1) % 4`). No user-supplied text reaches the command. After a 300 ms
+timer the shell calls `Hyprland.refreshMonitors()` so the label reflects the new
+orientation. Layout mode already treats rotated geometry through the same
+size heuristic, so Phone/Tablet/Desktop re-evaluate after rotation.
+
 The Lua `window.open` handler reads the saved mode for each new ordinary window.
 It uses the same size thresholds, accounting for monitor scale/rotation. Mobile
 modes request maximization; Desktop leaves ordinary dwindle tiling. Floating

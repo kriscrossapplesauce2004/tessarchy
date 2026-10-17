@@ -271,6 +271,15 @@ check("phone", 400, 800, 1, 0, false, 2, 0)
                                 capture_output=True, text=True)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('grim is required', result.stderr)
+    def test_rotation_control_installs_and_removes_cleanly(self):
+        uninstall = (ROOT / 'scripts/uninstall-dev.sh').read_text()
+        self.assertIn('RotationControl.qml', uninstall)
+        page = (ROOT / 'shell/components/SettingsPage.qml').read_text()
+        self.assertIn('RotationControl {', page)
+        control = (ROOT / 'shell/components/RotationControl.qml').read_text()
+        self.assertIn('Quickshell.execDetached([', control)
+        self.assertIn('"keyword", "monitor"', control)
+        self.assertIn('transform', control)
 
     def test_iso_staging_preserves_boot_assets_and_account_databases(self):
         # Minimal fixture exercises our assembly, not upstream archiso validity.

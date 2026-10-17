@@ -105,3 +105,9 @@ function duration(seconds) {
     if (hours > 0) return hours + "h " + String(minutes).padStart(2, "0") + "m";
     return minutes + "m";
 }
+
+// Hyprland monitor transforms: 0/1/2/3 are normal/90/180/270 degrees.
+function nextTransform(current) {
+    const value = Number.isInteger(current) ? current : 0;
+    return ((value + 1) % 4 + 4) % 4;
+}

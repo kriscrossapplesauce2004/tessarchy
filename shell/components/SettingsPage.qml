@@ -107,6 +107,19 @@ ColumnLayout {
         wrapMode: Text.WordWrap
     }
     Text {
+        text: "SCREEN"
+        color: page.accentColor
+        font {
+            pixelSize: 11
+            bold: true
+            letterSpacing: 2
+        }
+    }
+    RotationControl {
+        Layout.fillWidth: true
+        accentColor: page.accentColor
+    }
+    Text {
         text: "KEYBOARD"
         color: page.accentColor
         font {

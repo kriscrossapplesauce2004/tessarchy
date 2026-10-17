@@ -191,4 +191,13 @@ TestCase {
         compare(Policy.duration(3660), "1h 01m");
         compare(Policy.duration(7325), "2h 02m");
     }
+    function test_next_transform_cycles_through_four_orientations() {
+        compare(Policy.nextTransform(0), 1);
+        compare(Policy.nextTransform(1), 2);
+        compare(Policy.nextTransform(2), 3);
+        compare(Policy.nextTransform(3), 0);
+        compare(Policy.nextTransform(5), 2);
+        compare(Policy.nextTransform(-1), 0);
+        compare(Policy.nextTransform("junk"), 1);
+    }
 }
