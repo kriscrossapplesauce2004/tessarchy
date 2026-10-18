@@ -1,0 +1,11 @@
+[  288.803390] tessera-shell[579]: [0;1;39m[32m  INFO[0m: Launching config: "/usr/share/tessarchy/shell/shell.qml"[0m
+[  288.826466] tessera-shell[579]: [0;1;39m[32m  INFO[0m: Shell ID: "5941b9a7693fd9df99034b5700a2f6d5" Path ID "5941b9a7693fd9df99034b5700a2f6d5"[0m
+[  304.891664] tessera-shell[579]: [0;1;39m[32m  INFO[0m: Saving logs to "/run/user/1000/quickshell/by-id/2gscy2nt/log.qslog"[0m
+[  310.445721] tessera-shell[579]: [0;1;39mMESA-EGL: warning: egl: failed to create dri2 screen[0m
+[  310.623903] tessera-shell[579]: [0;1;39mMESA-EGL: warning: egl: failed to create dri2 screen[0m
+[  320.304579] tessera-shell[579]: [0;1;39m[33m  WARN[97m quickshell.dbus.objectmanager[0m: Failed to create DBusObjectManagerInterface for "org.bluez" "/" : QDBusError("", "")[0m
+[  320.343654] tessera-shell[579]: [0;1;39m[31m ERROR[97m quickshell.network[0m: Network will not work. Could not find an available backend.[0m
+[  349.333004] tessera-shell[579]: [0;1;39m[32m  INFO[0m: Configuration Loaded[0m
+[  369.017842] tessera-shell[579]: [0;1;39m[33m  WARN[97m qt.qpa.services[0m: Failed to register with host portal QDBusError("org.freedesktop.portal.Error.Failed", "Could not register app ID: Connection already associated with an application ID")[0m
+[  371.016642] tessera-shell[579]: [0;1;39m[33m  WARN[97m quickshell.dbus[0m: Could not launch service org.freedesktop.UPower.PowerProfiles: QDBusError(org.freedesktop.DBus.Error.NoReply, Did not receive a reply. Possible causes include: the remote application did not send a reply, the message bus security policy blocked the reply, the reply timeout expired, or the network connection was broken.)[0m
+[  371.024751] tessera-shell[579]: [0;1;39m[33m  WARN[97m quickshell.service.powerprofiles[0m: Could not start PowerProfilesDaemon. The PowerProfiles service will not work.[0m
