@@ -673,6 +673,32 @@ Actually performed:
 
 Not performed: no Bluetooth adapter exists on the development host and the
 image ships without BlueZ, so toggling, discovery, connect/disconnect,
-battery accuracy and pairing were not exercised. A live ISO boot to confirm
-the panel renders its no-adapter state is planned for the next ISO build and
-has not been performed for this branch.
+battery accuracy and pairing were not exercised. The build 7 section below
+records the live ISO boots confirming the no-adapter state renders.
+
+## Build 7 (Bluetooth merge) and live ISO boots, 2026-10-18 UTC
+
+Actually performed:
+
+- Rebuilt the ISO from the integration branch after merging the Bluetooth
+  quick controls (`83e2838`): `dist/tessarchy-0.1.0-20261018-x86_64.iso`,
+  1,088,454,656 bytes, SHA-256
+  `2e93e66da19542249dd212896f41cbdb2edb7ebcdff25fc6beeaa594ff2b1df4`. The
+  image ships without BlueZ (verified in `packages.x86_64`) and the squashfs
+  contains `usr/share/tessarchy/shell/components/BluetoothPanel.qml`.
+- BIOS boot (TCG, 1200 s) reached the full shell; the status bar shows the
+  Bluetooth icon slashed and dimmed, the designed no-adapter state.
+- The first UEFI attempt did not reach the shell within 1200 s: the guest was
+  still on `Wait Until Kernel Time Synchronized` (diskless VM, no NIC, TCG
+  boot). A rerun with an 1800 s window reached the full shell with the same
+  slashed icon. The first attempt is not counted as a boot pass.
+- A diagnostic ISO (journald forwarded to serial, shell output through
+  `logger -t tessera-shell`) shows `INFO: Configuration Loaded` with no QML
+  errors and no failure while loading `BluetoothPanel`; the only Bluetooth
+  line is the expected
+  `WARN quickshell.dbus.objectmanager: Failed to create DBusObjectManagerInterface for "org.bluez"`
+  because BlueZ is absent, handled with the no-adapter state instead of an
+  error.
+
+Not performed: pairing, adapter toggling, discovery and battery readings on
+hardware; neither the image nor the development host has an adapter.
