@@ -979,16 +979,31 @@ Validated locally:
   and `Owe`, the `ConnectionState` values, and
   `wifiEnabled`/`wifiHardwareEnabled`/`scannerEnabled`.
 - The staged ISO profile enables `NetworkManager.service` instead of
-  `systemd-networkd` and packages `networkmanager` and `wpa_supplicant`;
-  `systemd-resolved` and `systemd-timesyncd` remain enabled. The staging test
-  asserts the symlink and packages.
+  `systemd-networkd` and packages `networkmanager`, `wpa_supplicant` and
+  `dnsmasq`; `systemd-resolved` and `systemd-timesyncd` remain enabled. The
+  staging test asserts the symlink and packages. `dnsmasq` was added after a
+  guest run showed `nmcli device wifi hotspot` failing with
+  `ip-config-unavailable` (`could not start dnsmasq`): NetworkManager starts
+  dnsmasq itself to serve DHCP on a shared/hotspot connection, so the live
+  image needs the binary for the hotspot flow to come up.
+- Guest run on the build 10 debug image (QEMU x86_64, `mac80211_hwsim`
+  loaded manually in-guest): the hotspot profile activated on the AP radio
+  with a manual address (`Connection successfully activated`) once DHCP was
+  not required, the client radio scanned the SSID, and the shell's
+  NetworkManager integration enumerated the access point in its live log
+  (`AccessPoint` updates ending in `Ssid to: Tessarchy-Test`, `Strength to:
+  100`). The pull-down opens both from the status-strip drag and from
+  `qs ipc call controls toggle`, and a rotated capture confirmed the sheet and
+  status layer render with the rest of the shell. Shell-side NM property
+  churn from the two radios was handled without errors.
 
 Not performed:
 
-- No guest association. The host and the standard live image expose no wireless
-  hardware. A `mac80211_hwsim`-based debug image (access point on one radio,
-  panel scan and passphrase entry on the other) is planned for the next debug
-  boot; NetworkManager D-Bus behavior without hardware was not exercised.
+- No panel-driven connection to a connected state yet. The debug image used
+  for the run above predates the `dnsmasq` addition, so the hotspot had no
+  DHCP server and the client side could not reach `connected`; the next debug
+  boot with the updated package list drives the pull-down, taps through the
+  network row and watches the connected state end to end.
 - No real touch-keyboard passphrase entry. The drawer grants the status layer
   exclusive keyboard focus only while the prompt is open so squeekboard and
   hardware keyboards can reach the field; QMP-driven typing is planned with the
