@@ -997,13 +997,30 @@ Validated locally:
   status layer render with the rest of the shell. Shell-side NM property
   churn from the two radios was handled without errors.
 
+- Second guest run on a debug image built from this branch (dnsmasq in the
+  image): `nmcli device wifi hotspot` came up with no workaround
+  (`Device 'wlan0' successfully activated`, `dnsmasq ... DHCP, IP range
+  10.42.0.10 -- 10.42.0.254`), and the client radio associated with the
+  passphrase and took a lease: `Device 'wlan1' successfully activated`,
+  `10.42.0.126/24` with `dhcp_server_identifier = 10.42.0.1`. The shell's
+  NetworkManager integration tracked the same connection in its live log
+  (`Device:State`, `ActiveConnection ... :State`, `AccessPoint:Strength to
+  90`), which is the data the quick controls render.
+- The panel tap-through could not be driven on that boot: the guest
+  compositor's EGL setup failed (`egl: failed to create dri2 screen`,
+  `NEEDED EXTENSION: falling back to kms_swrast`) and its output stayed black,
+  which also blocks screenshot evidence; the run before had rendered fine, so
+  this is a VM/virtio-gpu race rather than a shell defect. A live-boot
+  robustness note from the same debug work: a live ISO should not let
+  `systemd-time-wait-sync` gate the boot with no network (it can wait forever
+  on a machine with no RTC battery and no link); the debug images mask it and
+  skip plymouth, and the shipped image treatment is a follow-up task.
+
 Not performed:
 
-- No panel-driven connection to a connected state yet. The debug image used
-  for the run above predates the `dnsmasq` addition, so the hotspot had no
-  DHCP server and the client side could not reach `connected`; the next debug
-  boot with the updated package list drives the pull-down, taps through the
-  network row and watches the connected state end to end.
+- No panel-driven connection to a connected state yet: the run above proves
+  hotspot, passphrase association, DHCP and the shell-side tracking, but the
+  pull-down tap-through itself needs a boot whose compositor renders.
 - No real touch-keyboard passphrase entry. The drawer grants the status layer
   exclusive keyboard focus only while the prompt is open so squeekboard and
   hardware keyboards can reach the field; QMP-driven typing is planned with the
