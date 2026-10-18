@@ -94,6 +94,28 @@ class Workflows(unittest.TestCase):
         self.run_script('uninstall-dev.sh')
         self.assertEqual(extra.read_text(), 'keep')
 
+    def test_bluetooth_panel_wires_adapter_without_pairing(self):
+        shell = (ROOT / 'shell/shell.qml').read_text()
+        self.assertIn('import Quickshell.Bluetooth', shell)
+        self.assertIn('readonly property var bluetoothAdapter: Bluetooth.defaultAdapter', shell)
+        self.assertIn('BluetoothPanel {', shell)
+        self.assertIn('available: root.bluetoothAvailable', shell)
+        panel = (ROOT / 'shell/components/BluetoothPanel.qml').read_text()
+        self.assertIn('import Quickshell.Bluetooth', panel)
+        self.assertIn('Policy.btAction(', panel)
+        self.assertIn('device.connect()', panel)
+        self.assertIn('device.disconnect()', panel)
+        self.assertIn('panel.adapter.discovering = panel.visible', panel)
+        self.assertIn('no adapter available', panel)
+        # Pairing needs interactive input; the panel never claims to do it.
+        self.assertNotIn('pair(', panel)
+        self.assertNotIn('forget(', panel)
+        # uninstall-dev.sh mirrors the installed shell tree (see the
+        # install/uninstall roundtrip test), so no file list is asserted here.
+        policy = (ROOT / 'shell/LayoutPolicy.js').read_text()
+        self.assertIn('function btAction', policy)
+        self.assertIn('function btBatteryLabel', policy)
+
     def test_session_refuses_nested_graphical_launch(self):
         env = dict(self.env, WAYLAND_DISPLAY='wayland-test')
         result = subprocess.run([str(ROOT / 'session/start-tessarchy')], env=env,

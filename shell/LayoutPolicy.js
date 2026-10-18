@@ -124,3 +124,17 @@ function wifiAction(connected, known, openSecurity) {
     if (known || openSecurity) return "connect";
     return "none";
 }
+
+// What tapping a Bluetooth device row does: connected devices disconnect,
+// already-paired devices connect, everything else needs pairing first.
+function btAction(connected, paired) {
+    if (connected) return "disconnect";
+    if (paired) return "connect";
+    return "none";
+}
+
+// Quickshell reports Bluetooth battery as 0.0..1.0, only when available.
+function btBatteryLabel(available, level) {
+    if (!available) return "";
+    return " · " + signalPercent(level) + "%";
+}

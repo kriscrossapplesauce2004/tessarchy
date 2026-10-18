@@ -215,4 +215,19 @@ TestCase {
         compare(Policy.wifiAction(false, false, true), "connect");
         compare(Policy.wifiAction(false, false, false), "none");
     }
+    function test_bt_action_matrix() {
+        compare(Policy.btAction(true, true), "disconnect");
+        compare(Policy.btAction(true, false), "disconnect");
+        compare(Policy.btAction(false, true), "connect");
+        compare(Policy.btAction(false, false), "none");
+    }
+    function test_bt_battery_label_only_when_available() {
+        compare(Policy.btBatteryLabel(false, 0.5), "");
+        compare(Policy.btBatteryLabel(true, 0.42), " · 42%");
+        compare(Policy.btBatteryLabel(true, 0), " · 0%");
+        compare(Policy.btBatteryLabel(true, 1), " · 100%");
+        compare(Policy.btBatteryLabel(true, 1.5), " · 100%");
+        compare(Policy.btBatteryLabel(true, -0.2), " · 0%");
+        compare(Policy.btBatteryLabel(true, undefined), " · 0%");
+    }
 }

@@ -11,7 +11,7 @@ import Quickshell.Services.SystemTray
 import Quickshell.Services.Notifications
 import Quickshell.Services.Mpris
 import Quickshell.Networking
-
+import Quickshell.Bluetooth
 import "components"
 import "LayoutPolicy.js" as Policy
 
@@ -59,6 +59,10 @@ ShellRoot {
     // a NetworkManager backend is present, so a disconnected radio still shows.
     readonly property real wifiStrength: root.wifiConnected ? root.wifiConnected.signalStrength : -1
     property real cellularStrength: -1
+    // Bluetooth binds only when BlueZ exposes an adapter; never invent one.
+    readonly property var bluetoothAdapter: Bluetooth.defaultAdapter
+    readonly property bool bluetoothAvailable: root.bluetoothAdapter !== null
+    readonly property bool bluetoothOn: root.bluetoothAvailable && root.bluetoothAdapter.enabled
     readonly property var audioSink: audioLoader.item ? (audioLoader.item as AudioStatus).sink : null
     readonly property bool audioAvailable: !!(audioSink && audioSink.ready && audioSink.audio)
     readonly property int volumePercent: audioAvailable ? Math.round(audioSink.audio.volume * 100) : 0
@@ -468,6 +472,11 @@ ShellRoot {
                                         color: "#f0f5ff"
                                         Layout.fillWidth: true
                                         wrapMode: Text.WordWrap
+                                    }
+                                    BluetoothPanel {
+                                        Layout.fillWidth: true
+                                        accentColor: root.accentColor
+                                        adapter: root.bluetoothAdapter
                                     }
                                     Text {
                                         visible: brightnessControl.available || nightLightToggle.available
@@ -888,6 +897,12 @@ ShellRoot {
                         label: "Wi-Fi"
                         strength: root.wifiStrength
                         available: root.networkBackend
+                    }
+                    StatusIcon {
+                        symbol: "bluetooth"
+                        label: "Bluetooth"
+                        strength: root.bluetoothOn ? 0 : -1
+                        available: root.bluetoothAvailable
                     }
                     NavButton {
                         text: root.audioAvailable ? "Volume " + root.volumePercent + "%" : "Quick controls · audio unavailable"

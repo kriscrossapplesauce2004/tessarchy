@@ -111,6 +111,11 @@ lands. Only monitor-backed displays are trusted for labels; nothing device- or
 network-supplied reaches a command or path. Cellular modem control and secure
 locking are not claimed.
 
+Bluetooth quick controls bind only when BlueZ exposes an adapter: the panel
+toggles the radio, enables discovery while visible, and connects or
+disconnects already-paired devices; pairing, forgetting and passkey agents
+are out of scope.
+
 ## Notification delivery
 
 Tessera registers Quickshell's `NotificationServer`, which claims
