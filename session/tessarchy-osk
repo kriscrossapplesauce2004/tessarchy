@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Use a private settings backend for the optional on-screen keyboard.
+set -euo pipefail
+usage() { echo "Usage: $0 start | show | hide | toggle" >&2; exit 2; }
+[[ $# == 1 ]] || usage
+bus=sm.puri.OSK0
+object=/sm/puri/OSK0
+set_visible() { busctl --user call "$bus" "$object" "$bus" SetVisible b "$1" >/dev/null; }
+case "$1" in
+start)
+    if ! command -v squeekboard >/dev/null; then
+        echo "squeekboard not installed; on-screen keyboard unavailable" >&2
+        exit 0
+    fi
+    [[ -n ${WAYLAND_DISPLAY:-} ]] || { echo "Run inside the Tessarchy session" >&2; exit 1; }
+    state=${XDG_STATE_HOME:-$HOME/.local/state}/tessarchy/osk
+    keyfile=$state/glib-2.0/settings/keyfile
+    if [[ ! -e $keyfile && ! -L $keyfile ]]; then
+        mkdir -p -- "${keyfile%/*}"
+        printf '%s\n' '[org/gnome/desktop/a11y/applications]' \
+            'screen-keyboard-enabled=true' > "$keyfile"
+    fi
+    export GSETTINGS_BACKEND=keyfile XDG_CONFIG_HOME=$state
+    exec squeekboard
+    ;;
+show) set_visible true ;;
+hide) set_visible false ;;
+toggle)
+    visible=$(busctl --user get-property "$bus" "$object" "$bus" Visible)
+    if [[ $visible == "b true" ]]; then set_visible false; else set_visible true; fi
+    ;;
+*) usage ;;
+esac

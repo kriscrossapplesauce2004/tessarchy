@@ -1,0 +1,45 @@
+name: Project website
+on:
+  push:
+    branches: [main, build/live-iso]
+    paths:
+      - 'website/**'
+      - 'assets/screenshots/**'
+      - 'assets/roadmap/**'
+      - 'shell/**'
+      - 'docs/**'
+      - 'Operation-TESSARCHY.md'
+      - 'README.md'
+      - 'scripts/build-site.py'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch public release metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build
+          gh api repos/${{ github.repository }}/releases > build/releases.json
+      - name: Build site from repository assets
+        run: python3 scripts/build-site.py --output dist/website --releases build/releases.json
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/website
+      - uses: actions/deploy-pages@v4
+        id: deployment

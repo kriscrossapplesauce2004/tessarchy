@@ -7,6 +7,8 @@ TouchButton {
     property bool showLabel: true
     Layout.fillWidth: true
     Layout.preferredWidth: 1
+    Layout.minimumHeight: 48
+    implicitHeight: 48
     padding: 4
     background: Rectangle {
         radius: 16
@@ -20,10 +22,10 @@ TouchButton {
             Image {
                 anchors.horizontalCenter: parent.horizontalCenter
                 source: "../icons/" + control.symbol + ".svg"
-                sourceSize.width: 24
-                sourceSize.height: 24
-                width: 24
-                height: 24
+                sourceSize.width: 21
+                sourceSize.height: 21
+                width: 21
+                height: 21
             }
             Text {
                 visible: control.showLabel

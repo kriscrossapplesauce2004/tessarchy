@@ -37,7 +37,8 @@ For a larger machine use `VM_RAM=4096 VM_CPUS=4 ./scripts/vm.sh run <ISO>`.
 a persistent guest variables file. `vm.sh plan <ISO>` prints the command without
 starting QEMU. `VM_DISPLAY=sdl` selects another graphical backend.
 
-No `/dev/kvm` was exposed to the coding session. Check on your actual host:
+The current development guest has been tested with KVM. Check acceleration
+availability on a new host:
 
 ```bash
 ls -l /dev/kvm

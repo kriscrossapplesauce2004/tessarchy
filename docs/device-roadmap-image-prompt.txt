@@ -1,0 +1,36 @@
+Use case: infographic-diagram.
+Create a premium professional portrait roadmap poster for Tessarchy, a real early-stage Arch Linux mobile interface project. Use the attached official mint geometric Tessarchy logo as a reference image only, reproduce its identity faithfully near the header. Portrait 2:3, high resolution, exceptionally legible typography, refined editorial grid, midnight navy, mint and off-white, subtle glass panels, restrained line icons, fine connector lines, generous spacing. Quiet Edge visual direction, sophisticated technical product presentation, no comic aesthetic. Polished small concept phone and tablet renders near the finish, visibly labelled as concepts, no claims of existing hardware.
+Title exactly "TESSARCHY"
+Large subtitle exactly "From prototype to device"
+Small subtitle "A milestone roadmap to a phone or tablet in your hand"
+Top status chip: "CURRENT: VM PROTOTYPE"
+Status text: "Mobile shell and PIN login validated in a virtual machine."
+Main roadmap proceeds sequentially from 01 to 06, with these exact headings and concise text:
+01 "STABILIZE THE EXPERIENCE"
+"Polish navigation, app switching, settings and touch input."
+Gate label "Gate: repeatable VM tests"
+02 "SELECT REFERENCE HARDWARE"
+"Verify Linux support, boot access, display, touch and drivers."
+Gate label "Gate: one supported device selected"
+03 "BOOT ON REAL HARDWARE"
+"Bring up graphics, Wi-Fi, Bluetooth, audio and charging."
+Gate label "Gate: usable native session"
+04 "COMPLETE THE DEVICE EXPERIENCE"
+Here split into two parallel smaller glass cards:
+"TABLET" / "Rotation, apps, battery life and suspend/resume"
+"PHONE" / "All tablet requirements plus cellular data, calls and SMS"
+Gate label "Gate: hardware features validated"
+05 "HARDEN AND RECOVER"
+"PIN enrollment, data protection, signed updates and rollback."
+Gate label "Gate: update and recovery drills pass"
+06 "PILOT IN HAND"
+"Test daily use. Publish an image, install guide and known issues."
+Gate label "Gate: reliable use on the reference device"
+Finish statement: "A working handheld first. Broader device support next."
+Footer: "Milestone-based • No promised dates • Hardware support remains to be proven"
+Make current state visibly different from future planned milestones. All phases 01–06 planned, no fake completion percentages, fabricated dates, commercial certification claims or supported hardware brands. Keep every requested word accurate and readable. Use aesthetically balanced professional layout with enough space for all labels.
+
+
+Final built-in edit pass: preserve the entire poster; correct timeline labels
+to 00 for current VM, then 01 through 06 for the six planned stages. Correct the
+concept captions to CONCEPT PHONE and CONCEPT TABLET. No other changes.

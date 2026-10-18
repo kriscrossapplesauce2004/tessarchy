@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Run only as greetd's greeter, before the user session exists.
+set -euo pipefail
+[[ $# -eq 0 && -n ${GREETD_SOCK:-} ]] || { echo "Start this greeter through greetd" >&2; exit 1; }
+share=${TESSARCHY_DATA_DIR:-/usr/share/tessarchy}
+[[ -f "$share/shell/greeter.qml" ]] || { echo "Greeter source not installed" >&2; exit 1; }
+if [[ -z ${TESSARCHY_LOGIN_USER:-} && -r /etc/tessarchy/login-user ]]; then
+    IFS= read -r TESSARCHY_LOGIN_USER < /etc/tessarchy/login-user
+fi
+export TESSARCHY_LOGIN_USER=${TESSARCHY_LOGIN_USER:-tess}
+[[ $TESSARCHY_LOGIN_USER =~ ^[a-z_][a-z0-9_-]*\$?$ ]] || { echo "Invalid login account" >&2; exit 1; }
+export QT_QPA_PLATFORM=wayland
+[[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] || { echo "Greeter compositor is unavailable" >&2; exit 1; }
+finish() { /usr/bin/hyprctl eval 'hl.dispatch(hl.dsp.exit())' >/dev/null 2>&1 || true; }
+trap finish EXIT
+/usr/bin/qs --path "$share/shell/greeter.qml"

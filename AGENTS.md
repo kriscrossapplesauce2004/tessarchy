@@ -11,9 +11,20 @@ Hyprland/Omarchy configuration or install dependencies automatically. Session
 configuration targets Hyprland 0.56 Lua and Quickshell 0.3.1. Check installed
 QML type metadata and `Hyprland --verify-config` when changing those APIs.
 
-Keep touch targets >=48 logical pixels, preserve keyboard focus in navigation,
+Keep touch targets >=48 logical pixels; on-screen keyboard keys may be narrower
+but must remain >=48 logical pixels tall (owner decision 2026-10-17). Preserve
+keyboard focus in navigation,
 and confirm close and exit. No secure locking claims. Record actual validation
 separately from planned/manual checks in docs/testing.md. Do not claim an ISO
 boots until it has booted in a VM. Never run image builds with host privileges
 without the user's explicit build command. Keep scripts argument-safe and fail
-before overwriting unrelated files. Never commit disk images or credentials.
+before overwriting unrelated files. Never commit disk images or private credentials.
+Owner-designated public demo credentials may be documented when explicitly requested.
+
+Agent onboarding and the shared planning backlog: [AGENT-README.md](AGENT-README.md).
+Use standard technical English and one-line comments. Keep documentation direct:
+state capabilities, instructions and validation once; omit repetitive caveats,
+generic warnings and speculative disclaimers. Keep current evidence in
+`docs/testing.md` and session progress in the ignored `.HANDOFF.local.md`.
+Keep personal names, local usernames and absolute personal paths out of tracked
+files. Use project-relative paths, `$HOME` or generic placeholders.

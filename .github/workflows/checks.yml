@@ -1,0 +1,44 @@
+name: Source checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install check dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            python3 lua5.4 fish shellcheck \
+            qt6-declarative-dev-tools \
+            qml6-module-qtquick qml6-module-qtquick-templates \
+            qml6-module-qtquick-controls qml6-module-qtquick-layouts \
+            qml6-module-qtqml qml6-module-qtqml-models \
+            qml6-module-qtqml-workerscript qml6-module-qtquick-window \
+            qml6-module-qttest desktop-file-utils
+      - name: Run source checks
+        run: ./scripts/check.sh
+
+  arch:
+    runs-on: ubuntu-24.04
+    container: archlinux:base-devel
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install target toolchain in the disposable CI container
+        run: |
+          pacman -Syu --noconfirm --needed python lua fish shellcheck \
+            qt6-declarative quickshell hyprland desktop-file-utils ttf-dejavu
+          useradd --create-home checker
+          chown -R checker:checker "$GITHUB_WORKSPACE"
+      - name: Check as a non-root development user
+        run: runuser -u checker -- ./scripts/check.sh

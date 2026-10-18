@@ -1,0 +1,13 @@
+{
+  "capture": "Actual QEMU/KVM display captured through QMP screendump",
+  "date_utc": "2026-10-18",
+  "source_base": "2066eb8303853196ac0b9d040cc1b8bbf7cc2623",
+  "source_state": "Quiet Edge Plymouth and journal-routing changes in the working tree",
+  "frame_time_seconds": 15,
+  "file": "phone-startup.png",
+  "sha256": "0e8035eac3fa65518d07ea508cf67e4e29d049f0124a711e0bea7d3f7ce100b6",
+  "dimensions": [
+    400,
+    800
+  ]
+}

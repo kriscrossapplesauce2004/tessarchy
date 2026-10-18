@@ -3,7 +3,7 @@
 set -euo pipefail
 root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 for tool in curl gpgv sha256sum; do command -v "$tool" >/dev/null || { echo "Missing $tool" >&2; exit 1; }; done
-keyring=/usr/share/pacman/keyrings/archlinux.gpg
+keyring=${ARCH_ISO_KEYRING:-/usr/share/pacman/keyrings/archlinux.gpg}
 [[ -f "$keyring" ]] || { echo "Install/update archlinux-keyring first" >&2; exit 1; }
 mkdir -p "$root/vm"
 work=$(mktemp -d "$root/vm/.download.XXXXXX")

@@ -1,0 +1,50 @@
+{
+  "environment": "Existing QEMU/KVM development guest",
+  "capture_tool": "grim",
+  "captures": [
+    {
+      "file": "tablet-home.png",
+      "source_commit": "9c1f4a3f400a6358066b41ab9fb6720e4af33fb0",
+      "captured_utc_date": "2026-10-18",
+      "mode": "tablet",
+      "selection": "auto",
+      "width": 800,
+      "height": 1280,
+      "scale": 1,
+      "sha256": "248bf469ea519c7c0f350f0ccce91d147f35c07a3894d7221c831b06133ed03f"
+    },
+    {
+      "file": "tablet-controls.png",
+      "source_commit": "9c1f4a3f400a6358066b41ab9fb6720e4af33fb0",
+      "captured_utc_date": "2026-10-18",
+      "mode": "tablet",
+      "selection": "auto",
+      "width": 800,
+      "height": 1280,
+      "scale": 1,
+      "sha256": "b272a025da235bfc819bd639c29235891ec531cb82e212c9772dff7588d103f0"
+    },
+    {
+      "file": "desktop-home.png",
+      "source_commit": "9c1f4a3f400a6358066b41ab9fb6720e4af33fb0",
+      "captured_utc_date": "2026-10-18",
+      "mode": "desktop",
+      "selection": "auto",
+      "width": 1280,
+      "height": 800,
+      "scale": 1,
+      "sha256": "2a3f9cc68a1a84f63eaecccc3c5cd549d75f5005441d1ae374660bbc9030b474"
+    },
+    {
+      "file": "desktop-controls.png",
+      "source_commit": "9c1f4a3f400a6358066b41ab9fb6720e4af33fb0",
+      "captured_utc_date": "2026-10-18",
+      "mode": "desktop",
+      "selection": "auto",
+      "width": 1280,
+      "height": 800,
+      "scale": 1,
+      "sha256": "3bea526ae5100ef7202fdb5d107e8dfdc53a632ac5907cca14b6c28123f0c2ee"
+    }
+  ]
+}

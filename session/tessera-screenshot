@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Save a full-screen Wayland capture to a unique private file.
+set -euo pipefail
+[[ $# -eq 0 ]] || { echo "usage: tessera-screenshot" >&2; exit 64; }
+command -v grim >/dev/null || { echo "grim is required to take screenshots" >&2; exit 1; }
+directory=${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots
+mkdir -p -- "$directory"
+file=$(mktemp -- "$directory/tessarchy-$(date +%Y%m%d-%H%M%S)-XXXXXX.png")
+trap 'rm -f -- "$file"' EXIT
+grim "$file"
+trap - EXIT
+if command -v notify-send >/dev/null; then
+    notify-send -a Tessera "Screenshot saved" "$(basename -- "$file")" || true
+fi
+printf '%s\n' "$file"

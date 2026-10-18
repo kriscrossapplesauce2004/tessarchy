@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Tessarchy Quiet Edge
+Description=The Tessarchy power-on screen
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/tessarchy
+ScriptFile=/usr/share/plymouth/themes/tessarchy/tessarchy.script

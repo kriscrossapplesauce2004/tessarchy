@@ -1,0 +1,9 @@
+[general]
+source_profile = false
+
+[terminal]
+vt = 1
+
+[default_session]
+command = "/usr/bin/systemd-cat --identifier=tessarchy-greeter /usr/bin/env PATH=/usr/local/sbin:/usr/local/bin:/usr/bin HOME=/var/lib/tessarchy-greeter /usr/bin/dbus-run-session -- /usr/bin/start-hyprland -- --config /usr/share/tessarchy/session/greeter.lua"
+user = "greeter"

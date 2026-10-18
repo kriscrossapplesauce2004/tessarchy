@@ -1,0 +1,20 @@
+pkgname=tessarchy-bootsplash
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Tessarchy Quiet Edge animated power-on screen'
+arch=('any')
+license=('MIT')
+depends=('plymouth' 'ttf-dejavu')
+makedepends=('python-pillow' 'librsvg')
+source=("tessarchy-$pkgver.tar.gz")
+sha256sums=('SKIP')
+build() {
+    python "$srcdir/scripts/export-boot-assets.py" --output "$srcdir/boot-frames"
+}
+package() {
+    install -Dm644 "$srcdir/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    install -Dm644 "$srcdir/session/boot/plymouthd.conf" "$pkgdir/usr/share/tessarchy/boot/plymouthd.conf"
+    install -Dm644 "$srcdir/session/boot/retain-splash.conf" "$pkgdir/usr/lib/systemd/system/plymouth-quit.service.d/tessarchy.conf"
+    install -dm755 "$pkgdir/usr/share/plymouth/themes/tessarchy"
+    install -m644 "$srcdir/session/boot/tessarchy.plymouth" "$srcdir/session/boot/tessarchy.script" "$srcdir/boot-frames/"*.png "$pkgdir/usr/share/plymouth/themes/tessarchy/"
+}

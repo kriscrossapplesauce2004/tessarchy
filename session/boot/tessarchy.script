@@ -1,0 +1,77 @@
+Window.SetBackgroundTopColor(0.035294, 0.074510, 0.145098);
+Window.SetBackgroundBottomColor(0.035294, 0.074510, 0.145098);
+Plymouth.SetRefreshRate(20);
+
+fun minimum(a, b)
+{
+    if (a < b) return a;
+    return b;
+}
+size = minimum(240, minimum(Window.GetWidth() * 0.48, Window.GetHeight() * 0.3));
+for (index = 0; index < 64; index++)
+    frames[index] = Image("logo-" + index + ".png").Scale(size, size);
+
+logo = Sprite(frames[0]);
+logo.SetPosition(Window.GetX() + (Window.GetWidth() - size) / 2,
+                 Window.GetY() + Window.GetHeight() * 0.43 - size / 2, 1);
+wordmark = Image.Text("T E S S A R C H Y", 0.66, 0.91, 0.84, 1, "DejaVu Sans 15");
+brand = Sprite(wordmark);
+brand.SetPosition(Window.GetX() + (Window.GetWidth() - wordmark.GetWidth()) / 2,
+                  Window.GetY() + Window.GetHeight() * 0.43 + size / 2 + 20, 1);
+status = Sprite();
+entry = Sprite();
+frame = 0;
+mode = "normal";
+
+fun center_text(sprite, text, y)
+{
+    image = Image.Text(text, 0.78, 0.86, 0.89, 1, "DejaVu Sans 11");
+    sprite.SetImage(image);
+    sprite.SetPosition(Window.GetX() + (Window.GetWidth() - image.GetWidth()) / 2, y, 10);
+}
+
+fun refresh()
+{
+    if (mode == "normal")
+    {
+        global.frame++;
+        if (frame >= 64) global.frame = 0;
+        logo.SetImage(frames[frame]);
+    }
+}
+
+fun normal()
+{
+    global.mode = "normal";
+    status.SetOpacity(0);
+    entry.SetOpacity(0);
+}
+
+fun password(prompt, count)
+{
+    global.mode = "password";
+    bullets = "";
+    for (i = 0; i < minimum(count, 32); i++) bullets += "•";
+    center_text(status, prompt, Window.GetY() + Window.GetHeight() * 0.7);
+    center_text(entry, bullets, Window.GetY() + Window.GetHeight() * 0.7 + 32);
+    status.SetOpacity(1);
+    entry.SetOpacity(1);
+}
+
+fun question(prompt, text)
+{
+    global.mode = "question";
+    center_text(status, prompt, Window.GetY() + Window.GetHeight() * 0.7);
+    center_text(entry, text, Window.GetY() + Window.GetHeight() * 0.7 + 32);
+    status.SetOpacity(1);
+    entry.SetOpacity(1);
+}
+
+fun message(text) {}
+fun quit() { logo.SetImage(frames[0]); }
+Plymouth.SetRefreshFunction(refresh);
+Plymouth.SetDisplayNormalFunction(normal);
+Plymouth.SetDisplayPasswordFunction(password);
+Plymouth.SetDisplayQuestionFunction(question);
+Plymouth.SetDisplayMessageFunction(message);
+Plymouth.SetQuitFunction(quit);

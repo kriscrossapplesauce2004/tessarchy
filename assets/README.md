@@ -16,3 +16,10 @@
 Artwork lives inside `shell/` so development copies, packages, source snapshots
 and the ISO staging workflow all carry the same assets. Generated preview
 screenshots belong in ignored `build/`, not here.
+
+The official logo kit is exported from the unchanged SVG by
+`scripts/export-brand-assets.py --output NEW_DIRECTORY`. It provides transparent
+mint/white/black PNG at 16–2048 pixels, SVG, WebP, JPG, ICO, vector PDF and spinning
+GIF/WebP/SVG variants, with source hashes and a ZIP manifest. Requires installed
+Pillow and rsvg-convert; it never installs dependencies or overwrites existing
+output. Generated kits stay under ignored dist/ and are distributed as artifacts.

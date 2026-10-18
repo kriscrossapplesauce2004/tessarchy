@@ -1,0 +1,19 @@
+pkgname=tessarchy-greeter
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Tessarchy phone-style greetd PIN sign-in'
+arch=('any')
+license=('MIT')
+depends=('tessarchy-session=0.1.0' 'greetd' 'hyprland>=0.56')
+backup=('etc/greetd/tessarchy.toml' 'etc/tessarchy/login-user')
+source=("tessarchy-$pkgver.tar.gz")
+sha256sums=('SKIP')
+package() {
+    install -Dm644 "$srcdir/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    install -Dm644 "$srcdir/session/greeter.lua" "$pkgdir/usr/share/tessarchy/session/greeter.lua"
+    install -Dm755 "$srcdir/session/tessarchy-greeter" "$pkgdir/usr/bin/tessarchy-greeter"
+    install -Dm644 "$srcdir/session/greetd/tessarchy.toml" "$pkgdir/etc/greetd/tessarchy.toml"
+    install -Dm644 "$srcdir/session/greetd/greetd.service.d/tessarchy.conf" "$pkgdir/usr/lib/systemd/system/greetd.service.d/tessarchy.conf"
+    install -Dm644 "$srcdir/session/greetd/tessarchy-greeter.tmpfiles" "$pkgdir/usr/lib/tmpfiles.d/tessarchy-greeter.conf"
+    install -Dm644 "$srcdir/session/greetd/login-user" "$pkgdir/etc/tessarchy/login-user"
+}

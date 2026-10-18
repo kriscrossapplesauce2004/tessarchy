@@ -2,5 +2,6 @@
 Name=Tessarchy (prototype)
 Comment=Tessera touch-first development session
 Exec=start-tessarchy
+TryExec=start-tessarchy
 Type=Application
 DesktopNames=Hyprland

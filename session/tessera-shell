@@ -8,4 +8,9 @@ export TESSARCHY_AUDIO=0
 if [[ -S "${XDG_RUNTIME_DIR:-/run/user/$UID}/pipewire-0" ]]; then
     export TESSARCHY_AUDIO=1
 fi
+# Offer the keyboard toggle only when the optional on-screen keyboard exists.
+export TESSARCHY_OSK=0
+if command -v squeekboard >/dev/null && command -v tessarchy-osk >/dev/null; then
+    export TESSARCHY_OSK=1
+fi
 exec qs --no-duplicate --path "$share/shell/shell.qml" "$@"

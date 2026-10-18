@@ -1,43 +1,41 @@
 # Contributing to Tessarchy
 
-Tessarchy is in its first prototype stage. Small, focused changes and clear
-reports from real VM/tablet testing are especially useful. Start with the
-[architecture](docs/architecture.md), [roadmap](docs/roadmap.md), and local
-[development instructions](AGENTS.md).
+Start with [AGENT-README.md](AGENT-README.md) for project context, the task board
+and the contribution workflow. [AGENTS.md](AGENTS.md) contains repository rules;
+An optional ignored `.HANDOFF.local.md` holds local session notes.
 
-## Development
+## Choose and plan work
 
-Clone the repository and follow the [VM setup](README.md#quick-start-use-the-basic-arch-vm).
-Work inside an Arch guest; the scripts must not replace a contributor's active
-Hyprland or Quickshell configuration. Dependency installation is a separate,
-explicit step. Current API assumptions are Hyprland 0.56.x and Quickshell 0.3.1.
+Claim one task, record the branch and define a completion result. Keep changes
+focused and preserve contributor history. Check existing pull requests before
+starting a replacement implementation. The current review order and dependencies
+are in [docs/pr-triage.md](docs/pr-triage.md).
 
-From the repository root, run:
+Use standard technical English and one-line comments. Write direct descriptions
+of behavior, commands and results. Record limitations once where they affect a
+specific action or validation result.
+
+## Build and validate
+
+The API baseline is Hyprland 0.56 Lua and Quickshell 0.3.1. Development runs in an
+Arch guest. Inspect installed type metadata when changing API usage.
 
 ```bash
 ./scripts/check.sh
 ```
 
-This runs Bash/Lua syntax checks where tools are installed, workflow tests,
-Hyprland configuration validation, and QML linting. It reports missing optional
-tools. Passing static checks does not prove that the shell renders or that an
-ISO boots. Follow the [manual checklist](docs/testing.md) for affected behavior.
+Use scratch HOME for install/uninstall checks. Test affected UI behavior in the
+VM and attach real screenshots. Record commands, results and remaining manual
+checks in [docs/testing.md](docs/testing.md). The Ubuntu and Arch workflows run
+the source checks with their toolchains.
 
-## Changes and reports
+## Submit a contribution
 
-Keep pull requests focused and explain the problem, resulting behavior, and
-validation. Include screenshots for visual changes. State what was tested
-personally and which checks remain pending. Verify Quickshell APIs and Hyprland
-syntax against the installed versions or authoritative documentation.
+Lead the PR with the concrete problem and resulting behavior. Include the task
+ID, validation and relevant screenshots. Update the task register with the commit/PR link and next action. Keep machine
+paths and personal operational notes in the ignored local handoff. For bugs, include reproduction steps,
+source revision, display size/scale, relevant package versions and error output.
 
-For bugs, include the reproduction steps, expected/actual behavior, guest or
-device details, display resolution/scale, package versions, and relevant error
-output. Remove credentials and private information from logs before sharing.
-
-Keep controls at least 48 logical pixels, avoid hover-only actions, preserve
-application keyboard focus in navigation, and confirm destructive shell actions.
-Do not describe trackpad gestures as touchscreen support or an overlay as a
-secure lock screen. Track planned input-method and device work in the roadmap.
-
-Generated VM disks, ISO images, downloaded packages, and build output stay out
-of Git. The project is licensed under the [MIT License](LICENSE).
+Keep private credentials and disk images out of Git. Packages and images belong in
+ignored output directories or GitHub release assets. The project uses the
+[MIT License](LICENSE).

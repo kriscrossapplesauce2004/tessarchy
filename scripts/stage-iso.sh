@@ -26,27 +26,33 @@ file_permissions+=(
   ["/etc/shadow"]="0:0:400"
   ["/home/tess"]="1000:1000:750"
   ["/home/tess/.bash_profile"]="1000:1000:644"
+  ["/home/tess/.config/fish/config.fish"]="1000:1000:644"
   ["/usr/bin/start-tessarchy"]="0:0:755"
   ["/usr/bin/tessera-shell"]="0:0:755"
+  ["/usr/bin/tessarchy-osk"]="0:0:755"
+  ["/usr/bin/tessera-screenshot"]="0:0:755"
 )
 PROFILE
 airoot=$profile/airootfs
 mkdir -p "$airoot/usr/share/tessarchy/session" "$airoot/usr/bin" "$airoot/usr/share/wayland-sessions"
 cp -R -- "$root/shell" "$airoot/usr/share/tessarchy/"
+cp -R -- "$root/docs" "$airoot/usr/share/tessarchy/"
 cp -- "$root/session/hyprland.lua" "$airoot/usr/share/tessarchy/session/"
-install -m755 "$root/session/start-tessarchy" "$root/session/tessera-shell" "$airoot/usr/bin/"
+install -m755 "$root/session/start-tessarchy" "$root/session/tessera-shell" "$root/session/tessarchy-osk" "$root/session/tessera-screenshot" "$airoot/usr/bin/"
 install -m644 "$root/session/tessarchy.desktop" "$airoot/usr/share/wayland-sessions/"
 cp -a "$root/iso/airootfs/." "$airoot/"
 # Releng uses zsh for its root rescue login. Our smaller package set uses Bash.
 sed -i 's|^\(root:[^:]*:0:0:[^:]*:[^:]*:\).*|\1/usr/bin/bash|' "$airoot/etc/passwd"
 # Create the live user via systemd-sysusers, preserving base account databases.
+# The home scaffolding comes from the skel tree: Bash and fish login profiles.
 mkdir -p "$airoot/home/tess"
-cp "$root/iso/airootfs/etc/skel/.bash_profile" "$airoot/home/tess/.bash_profile"
-# Releng may enable SSH for rescue. Keep network services out of this prototype.
+cp -a "$root/iso/airootfs/etc/skel/." "$airoot/home/tess/"
+# Releng may enable SSH for rescue. Keep rescue services out of this prototype.
 find "$airoot/etc/systemd/system" -type l -name 'sshd.service' -delete
 mkdir -p "$airoot/etc/systemd/system/multi-user.target.wants"
-ln -sf /usr/lib/systemd/system/systemd-networkd.service "$airoot/etc/systemd/system/multi-user.target.wants/"
+ln -sf /usr/lib/systemd/system/NetworkManager.service "$airoot/etc/systemd/system/multi-user.target.wants/"
 ln -sf /usr/lib/systemd/system/systemd-resolved.service "$airoot/etc/systemd/system/multi-user.target.wants/"
+ln -sf /usr/lib/systemd/system/systemd-timesyncd.service "$airoot/etc/systemd/system/multi-user.target.wants/"
 ln -sf /run/systemd/resolve/stub-resolv.conf "$airoot/etc/resolv.conf"
 printf 'Tessarchy live prototype. tty1: tess autologin; no password login.\n' > "$airoot/etc/issue"
 echo "Profile staged: $profile"
